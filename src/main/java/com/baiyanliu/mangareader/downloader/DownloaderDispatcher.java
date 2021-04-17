@@ -16,7 +16,7 @@ import java.util.Map;
 @RequiredArgsConstructor(onConstructor = @__({@Autowired}))
 public class DownloaderDispatcher {
     private final Map<Source, Downloader> downloaders  = ImmutableMap.of(
-            Source.MANGA_SEE, new DownloaderMangaSee()
+            Source.MANGA_SEE, new MangaSeeDownloader()
     );
 
     private final MangaRepository mangaRepository;

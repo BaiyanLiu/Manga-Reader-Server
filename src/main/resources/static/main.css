@@ -112,3 +112,8 @@ div.collapsible {
 div.chapter {
     margin: 5px 0;
 }
+
+div.chapter-controls{
+    display: inline;
+    float: right;
+}

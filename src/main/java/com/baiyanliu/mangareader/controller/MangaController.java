@@ -7,6 +7,7 @@ import com.baiyanliu.mangareader.entity.Page;
 import com.baiyanliu.mangareader.entity.repository.MangaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -53,6 +54,10 @@ public class MangaController {
             @RequestParam("chapter") int chapterNumber) {
         log.log(Level.INFO, String.format("downloadChapter - manga [%d] chapter [%d]", mangaId, chapterNumber));
         Optional<Manga> manga = mangaRepository.findById(mangaId);
-        manga.ifPresent(value -> downloaderDispatcher.downloadChapter(value, chapterNumber));
+        manga.ifPresent(value -> {
+            Hibernate.initialize(value.getChapters());
+            Hibernate.initialize(value.getChapters().get(chapterNumber).getPages());
+            downloaderDispatcher.downloadChapter(value, chapterNumber);
+        });
     }
 }

@@ -15,7 +15,7 @@ public abstract class Downloader {
 
     protected final WebDriver driver;
 
-    public Downloader() {
+    protected Downloader() {
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless", "--disable-gpu", "--ignore-certificate-errors");
         driver = new ChromeDriver(options);

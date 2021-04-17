@@ -20,7 +20,7 @@ public class Chapter implements Comparable<Chapter> {
     private String name;
     private boolean downloaded;
     @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL)
     @MapKey(name = "number")
     private Map<Integer, Page> pages;
 

@@ -20,7 +20,7 @@ public class Manga {
     private Source source;
     private String sourceId;
     @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL)
     @MapKey(name = "number")
     private Map<Integer, Chapter> chapters = new TreeMap<>();
 
