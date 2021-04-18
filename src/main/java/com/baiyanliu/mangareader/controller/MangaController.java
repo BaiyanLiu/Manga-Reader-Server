@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.transaction.Transactional;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
@@ -36,6 +37,7 @@ public class MangaController {
     }
 
     @RequestMapping("/api/page")
+    @Transactional
     public Page getOnePage(
             @RequestParam("manga") Long mangaId,
             @RequestParam("chapter") int chapterNumber,
