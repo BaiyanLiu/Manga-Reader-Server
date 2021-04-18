@@ -1,5 +1,6 @@
 package com.baiyanliu.mangareader.downloader;
 
+import com.baiyanliu.mangareader.CustomLogger;
 import com.baiyanliu.mangareader.entity.Chapter;
 import com.baiyanliu.mangareader.entity.Manga;
 import com.baiyanliu.mangareader.entity.Page;
@@ -24,32 +25,29 @@ public class MangaSeeDownloader extends Downloader {
 
     @Override
     public void downloadMetadata(Manga manga, Consumer<Manga> callback) {
-        log.log(Level.INFO, String.format("downloadMetadata - manga [%d] name [%s] source [%s] source ID [%s] - Queuing download task.",
+        CustomLogger logger = new CustomLogger(log, String.format("downloadMetadata - manga [%d] name [%s] source [%s] source ID [%s] ",
                 manga.getId(), manga.getName(), manga.getSource(), manga.getSourceId()));
+        logger.log(Level.INFO, "Queuing download task", "");
         executor.submit(() -> {
             try {
                 String url = String.format(HOME_URL, manga.getSourceId());
-                log.log(Level.INFO, String.format("downloadMetadata - manga [%d] name [%s] source [%s] source ID [%s] URL [%s] - Starting download task.",
-                        manga.getId(), manga.getName(), manga.getSource(), manga.getSourceId(), url));
+                logger.log(Level.INFO, "Starting download task", String.format("URL [%s] ", url));
 
                 driver.get(url);
 
-                new WebDriverWait(driver, 300)
+                new WebDriverWait(driver, WEB_DRIVER_TIMEOUT)
                         .ignoring(StaleElementReferenceException.class)
                         .until((WebDriver d) -> {
-                            log.log(Level.INFO, String.format("downloadMetadata - manga [%d] name [%s] source [%s] source ID [%s] URL [%s] - Waiting for elements to load.",
-                                    manga.getId(), manga.getName(), manga.getSource(), manga.getSourceId(), url));
+                            logger.log(Level.INFO, "Waiting for elements to load", String.format("URL [%s] ", url));
                             d.findElement(By.className("ShowAllChapters")).click();
-                            log.log(Level.INFO, String.format("downloadMetadata - manga [%d] name [%s] source [%s] source ID [%s] URL [%s] - Elements loaded.",
-                                    manga.getId(), manga.getName(), manga.getSource(), manga.getSourceId(), url));
+                            logger.log(Level.INFO, "Elements loaded", String.format("URL [%s] ", url));
                             return true;
                         });
 
                 for (WebElement c : driver.findElements(By.className("ChapterLink"))) {
                     try {
                         int chapterNumber = extractChapterNumber(c.getAttribute("href"));
-                        log.log(Level.INFO, String.format("downloadMetadata - manga [%d] name [%s] source [%s] source ID [%s] URL [%s] chapter [%d]- Found chapter.",
-                                manga.getId(), manga.getName(), manga.getSource(), manga.getSourceId(), url, chapterNumber));
+                        logger.log(Level.INFO, "Found chapter", String.format("URL [%s] chapter [%d] ", url, chapterNumber));
                         if (!manga.getChapters().containsKey(chapterNumber)) {
                             Chapter chapter = new Chapter(chapterNumber, "Chapter " + chapterNumber);
                             manga.getChapters().put(chapter.getNumber(), chapter);
@@ -59,12 +57,10 @@ public class MangaSeeDownloader extends Downloader {
                     }
                 }
 
-                log.log(Level.INFO, String.format("downloadMetadata - manga [%d] name [%s] source [%s] source ID [%s] URL [%s] chapters [%d]- Finished download task.",
-                        manga.getId(), manga.getName(), manga.getSource(), manga.getSourceId(), url, manga.getChapters().size()));
+                logger.log(Level.INFO, "Finished download task", String.format("URL [%s] chapters [%d] ", url, manga.getChapters().size()));
                 callback.accept(manga);
             } catch (Exception e) {
-                log.log(Level.SEVERE, String.format("downloadMetadata - manga [%d] name [%s] source [%s] source ID [%s]- Error encountered.",
-                        manga.getId(), manga.getName(), manga.getSource(), manga.getSourceId()), e);
+                logger.log(Level.SEVERE, "Error encountered", "", e);
             }
         });
     }
@@ -77,19 +73,18 @@ public class MangaSeeDownloader extends Downloader {
 
     @Override
     public void downloadChapter(Manga manga, int chapterNumber, Consumer<Chapter> callback) {
-        log.log(Level.INFO, String.format("downloadChapter - manga [%d] name [%s] source [%s] source ID [%s] chapter [%d] - Queuing download task.",
+        CustomLogger logger = new CustomLogger(log, String.format("downloadChapter - manga [%d] name [%s] source [%s] source ID [%s] chapter [%d] ",
                 manga.getId(), manga.getName(), manga.getSource(), manga.getSourceId(), chapterNumber));
+        logger.log(Level.INFO, "Queuing download task", "");
         executor.submit(() -> {
             try {
-                log.log(Level.INFO, String.format("downloadChapter - manga [%d] name [%s] source [%s] source ID [%s] chapter [%d] - Starting download task.",
-                        manga.getId(), manga.getName(), manga.getSource(), manga.getSourceId(), chapterNumber));
+                logger.log(Level.INFO, "Starting download task", "");
 
                 Chapter chapter = manga.getChapters().get(chapterNumber);
                 int pageNumber = 1;
 
                 while (true) {
-                    log.log(Level.INFO, String.format("downloadChapter - manga [%d] name [%s] source [%s] source ID [%s] chapter [%d] page [%d] - Starting to download page.",
-                            manga.getId(), manga.getName(), manga.getSource(), manga.getSourceId(), chapterNumber, pageNumber));
+                    logger.log(Level.INFO, "Starting to download page", String.format("page [%d] ", pageNumber));
 
                     if (chapter.getPages().containsKey(pageNumber)) {
                         pageNumber++;
@@ -97,29 +92,25 @@ public class MangaSeeDownloader extends Downloader {
                     }
 
                     String url = String.format(PAGE_URL, manga.getSourceId(), chapterNumber, pageNumber);
-                    log.log(Level.INFO, String.format("downloadChapter - manga [%d] name [%s] source [%s] source ID [%s] chapter [%d] page [%d] URL [%s] - Downloading page.",
-                            manga.getId(), manga.getName(), manga.getSource(), manga.getSourceId(), chapterNumber, pageNumber, url));
+                    logger.log(Level.INFO, "Downloading page", String.format("page [%d] URL [%s] ", pageNumber, url));
 
                     driver.get(String.format(PAGE_URL, manga.getSourceId(), chapterNumber, pageNumber));
                     if ("404 Page Not Found".equals(driver.getTitle())) {
-                        log.log(Level.INFO, String.format("downloadChapter - manga [%d] name [%s] source [%s] source ID [%s] chapter [%d] page [%d] URL [%s] - Reached last page.",
-                                manga.getId(), manga.getName(), manga.getSource(), manga.getSourceId(), chapterNumber, pageNumber, url));
+                        logger.log(Level.INFO, "Reached last page", String.format("page [%d] URL [%s] ", pageNumber, url));
                         break;
                     }
 
                     Page page = new Page(pageNumber);
 
-                    new WebDriverWait(driver, 300)
+                    new WebDriverWait(driver, WEB_DRIVER_TIMEOUT)
                             .ignoring(StaleElementReferenceException.class)
                             .until((WebDriver d) -> {
-                                log.log(Level.INFO, String.format("downloadChapter - manga [%d] name [%s] source [%s] source ID [%s] chapter [%d] page [%d] URL [%s] - Waiting for elements to load.",
-                                        manga.getId(), manga.getName(), manga.getSource(), manga.getSourceId(), chapterNumber, page.getNumber(), url));
+                                logger.log(Level.INFO, "Waiting for elements to load", String.format("page [%d] URL [%s] ", page.getNumber(), url));
                                 String src = d.findElement(By.className("img-fluid")).getAttribute("src");
                                 if (src == null) {
                                     return false;
                                 }
-                                log.log(Level.INFO, String.format("downloadChapter - manga [%d] name [%s] source [%s] source ID [%s] chapter [%d] page [%d] URL [%s] - Elements loaded.",
-                                        manga.getId(), manga.getName(), manga.getSource(), manga.getSourceId(), chapterNumber, page.getNumber(), url));
+                                logger.log(Level.INFO, "Elements loaded", String.format("page [%d] URL [%s] ", page.getNumber(), url));
 
                                 try {
                                     BufferedImage image = ImageIO.read(new URL(src));
@@ -131,23 +122,20 @@ public class MangaSeeDownloader extends Downloader {
                                 return true;
                             });
 
-                    log.log(Level.INFO, String.format("downloadChapter - manga [%d] name [%s] source [%s] source ID [%s] chapter [%d] page [%d] - Finished downloading page.",
-                            manga.getId(), manga.getName(), manga.getSource(), manga.getSourceId(), chapterNumber, pageNumber));
+                    logger.log(Level.INFO, "Finished downloading page", String.format("page [%d] URL [%s] ", page.getNumber(), url));
                     pageNumber++;
                     try {
-                        Thread.sleep(2000);
+                        Thread.sleep(PAGE_DOWNLOAD_DELAY);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
 
                 chapter.setDownloaded(true);
-                log.log(Level.INFO, String.format("downloadChapter - manga [%d] name [%s] source [%s] source ID [%s] chapter [%d] pages [%d] - Finished download task.",
-                        manga.getId(), manga.getName(), manga.getSource(), manga.getSourceId(), chapterNumber, chapter.getPages().size()));
+                logger.log(Level.INFO, "Finished download task", String.format("pages [%d] ", chapter.getPages().size()));
                 callback.accept(chapter);
             } catch (Exception e) {
-                log.log(Level.SEVERE, String.format("downloadMetadata - manga [%d] name [%s] source [%s] source ID [%s] chapter [%d] - Error encountered.",
-                        manga.getId(), manga.getName(), manga.getSource(), manga.getSourceId(), chapterNumber), e);
+                logger.log(Level.SEVERE, "Error encountered", "", e);
             }
         });
     }
