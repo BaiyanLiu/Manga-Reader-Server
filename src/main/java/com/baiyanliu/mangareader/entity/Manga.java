@@ -22,7 +22,7 @@ public class Manga {
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL)
     @MapKey(name = "number")
-    private Map<Integer, Chapter> chapters = new TreeMap<>();
+    private Map<String, Chapter> chapters = new TreeMap<>();
 
     public Manga(String name, Source source, String sourceId) {
         this.name = name;

@@ -21,7 +21,7 @@ import java.util.logging.Level;
 @Log
 public class MangaSeeDownloader extends Downloader {
     private static final String HOME_URL = "https://mangasee123.com/manga/%s";
-    private static final String PAGE_URL = "https://mangasee123.com/read-online/%s-chapter-%d-page-%d.html";
+    private static final String PAGE_URL = "https://mangasee123.com/read-online/%s-chapter-%s-page-%d.html";
 
     @Override
     public void downloadMetadata(Manga manga, Consumer<Manga> callback) {
@@ -45,15 +45,11 @@ public class MangaSeeDownloader extends Downloader {
                         });
 
                 for (WebElement c : driver.findElements(By.className("ChapterLink"))) {
-                    try {
-                        int chapterNumber = extractChapterNumber(c.getAttribute("href"));
-                        logger.log(Level.INFO, "Found chapter", String.format("URL [%s] chapter [%d] ", url, chapterNumber));
-                        if (!manga.getChapters().containsKey(chapterNumber)) {
-                            Chapter chapter = new Chapter(chapterNumber, "Chapter " + chapterNumber);
-                            manga.getChapters().put(chapter.getNumber(), chapter);
-                        }
-                    } catch (NumberFormatException e) {
-                        e.printStackTrace();
+                    String chapterNumber = extractChapterNumber(c.getAttribute("href"));
+                    logger.log(Level.INFO, "Found chapter", String.format("URL [%s] chapter [%s] ", url, chapterNumber));
+                    if (!manga.getChapters().containsKey(chapterNumber)) {
+                        Chapter chapter = new Chapter(chapterNumber, "Chapter " + chapterNumber);
+                        manga.getChapters().put(chapter.getNumber(), chapter);
                     }
                 }
 
@@ -65,15 +61,15 @@ public class MangaSeeDownloader extends Downloader {
         });
     }
 
-    private int extractChapterNumber(String url) {
+    private String extractChapterNumber(String url) {
         int beginIndex = url.indexOf("-chapter-") + 9;
         int endIndex = url.indexOf("-page-");
-        return Integer.parseInt(url.substring(beginIndex, endIndex));
+        return url.substring(beginIndex, endIndex);
     }
 
     @Override
-    public void downloadChapter(Manga manga, int chapterNumber, Consumer<Chapter> callback) {
-        CustomLogger logger = new CustomLogger(log, String.format("downloadChapter - manga [%d] name [%s] source [%s] source ID [%s] chapter [%d] ",
+    public void downloadChapter(Manga manga, String chapterNumber, Consumer<Chapter> callback) {
+        CustomLogger logger = new CustomLogger(log, String.format("downloadChapter - manga [%d] name [%s] source [%s] source ID [%s] chapter [%s] ",
                 manga.getId(), manga.getName(), manga.getSource(), manga.getSourceId(), chapterNumber));
         logger.log(Level.INFO, "Queuing download task", "");
         executor.submit(() -> {

@@ -27,7 +27,7 @@ public class MangaController {
     private final DownloaderDispatcher downloaderDispatcher;
 
     @RequestMapping("/api/chapters")
-    public Map<Integer, Chapter> getAllChapters(@RequestParam("manga") Long mangaId) {
+    public Map<String, Chapter> getAllChapters(@RequestParam("manga") Long mangaId) {
         log.log(Level.INFO, String.format("getAllChapters - manga [%d]", mangaId));
         Optional<Manga> manga = mangaRepository.findById(mangaId);
         if (manga.isPresent()) {
@@ -40,10 +40,10 @@ public class MangaController {
     @Transactional
     public Page getOnePage(
             @RequestParam("manga") Long mangaId,
-            @RequestParam("chapter") int chapterNumber,
+            @RequestParam("chapter") String chapterNumber,
             @RequestParam("page") int pageNumber) {
-        log.log(Level.INFO, String.format("getOnePage - manga [%d] chapter [%d] page [%d]", mangaId, chapterNumber, pageNumber));
-        Map<Integer, Chapter> chapters = getAllChapters(mangaId);
+        log.log(Level.INFO, String.format("getOnePage - manga [%d] chapter [%s] page [%d]", mangaId, chapterNumber, pageNumber));
+        Map<String, Chapter> chapters = getAllChapters(mangaId);
         if (chapters.containsKey(chapterNumber)) {
             return chapters.get(chapterNumber).getPages().get(pageNumber);
         }
@@ -53,8 +53,8 @@ public class MangaController {
     @RequestMapping("/api/downloadChapter")
     public void downloadChapter(
             @RequestParam("manga") Long mangaId,
-            @RequestParam("chapter") int chapterNumber) {
-        log.log(Level.INFO, String.format("downloadChapter - manga [%d] chapter [%d]", mangaId, chapterNumber));
+            @RequestParam("chapter") String chapterNumber) {
+        log.log(Level.INFO, String.format("downloadChapter - manga [%d] chapter [%s]", mangaId, chapterNumber));
         Optional<Manga> manga = mangaRepository.findById(mangaId);
         manga.ifPresent(value -> {
             Hibernate.initialize(value.getChapters());

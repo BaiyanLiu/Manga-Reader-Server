@@ -16,22 +16,21 @@ public class Chapter implements Comparable<Chapter> {
     @GeneratedValue(generator = "chapterId") @Id private long id;
     @JsonIgnore @Version private long version;
 
-    private int number;
+    private String number;
     private String name;
     private boolean downloaded;
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL)
     @MapKey(name = "number")
-    private Map<Integer, Page> pages;
+    private Map<Integer, Page> pages = new HashMap<>();
 
-    public Chapter(int number, String name) {
+    public Chapter(String number, String name) {
         this.number = number;
         this.name = name;
-        this.pages = new HashMap<>();
     }
 
     @Override
     public int compareTo(Chapter o) {
-        return Integer.compare(number, o.number);
+        return Double.compare(Double.parseDouble(number), Double.parseDouble(o.number));
     }
 }

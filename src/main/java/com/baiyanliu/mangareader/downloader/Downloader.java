@@ -26,5 +26,5 @@ public abstract class Downloader {
 
     public abstract void downloadMetadata(Manga manga, Consumer<Manga> callback);
 
-    public abstract void downloadChapter(Manga manga, int chapterNumber, Consumer<Chapter> callback);
+    public abstract void downloadChapter(Manga manga, String chapterNumber, Consumer<Chapter> callback);
 }
