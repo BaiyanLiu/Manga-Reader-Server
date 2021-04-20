@@ -2,8 +2,6 @@ package com.baiyanliu.mangareader.downloader;
 
 import com.baiyanliu.mangareader.entity.Chapter;
 import com.baiyanliu.mangareader.entity.Manga;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
 import java.util.concurrent.ExecutorService;
@@ -16,12 +14,11 @@ public abstract class Downloader {
 
     protected final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    protected final WebDriver driver;
+    protected final ChromeOptions chromeOptions;
 
     protected Downloader() {
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless", "--disable-gpu", "--ignore-certificate-errors");
-        driver = new ChromeDriver(options);
+        chromeOptions = new ChromeOptions();
+        chromeOptions.addArguments("--headless", "--disable-gpu", "--ignore-certificate-errors");
     }
 
     public abstract void downloadMetadata(Manga manga, Consumer<Manga> callback);

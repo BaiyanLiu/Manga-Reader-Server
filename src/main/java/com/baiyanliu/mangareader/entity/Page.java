@@ -16,7 +16,7 @@ import java.io.IOException;
 @Entity
 @EqualsAndHashCode(exclude = "data")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Page implements Comparable<Page> {
+public class Page {
     @GeneratedValue(generator = "pageId") @Id private long id;
     @JsonIgnore @Version private long version;
 
@@ -31,10 +31,5 @@ public class Page implements Comparable<Page> {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         ImageIO.write(image, "jpg", out);
         data = out.toByteArray();
-    }
-
-    @Override
-    public int compareTo(Page o) {
-        return Integer.compare(number,  o.number);
     }
 }

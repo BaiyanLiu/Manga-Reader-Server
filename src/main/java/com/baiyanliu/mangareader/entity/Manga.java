@@ -6,8 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 @Data
 @Entity
@@ -20,9 +20,9 @@ public class Manga {
     private Source source;
     private String sourceId;
     @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL)
     @MapKey(name = "number")
-    private Map<String, Chapter> chapters = new TreeMap<>();
+    @OneToMany(cascade = CascadeType.ALL)
+    private Map<String, Chapter> chapters = new HashMap<>();
 
     public Manga(String name, Source source, String sourceId) {
         this.name = name;

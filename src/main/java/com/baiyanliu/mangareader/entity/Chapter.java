@@ -12,7 +12,7 @@ import java.util.Map;
 @Data
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Chapter implements Comparable<Chapter> {
+public class Chapter {
     @GeneratedValue(generator = "chapterId") @Id private long id;
     @JsonIgnore @Version private long version;
 
@@ -20,17 +20,12 @@ public class Chapter implements Comparable<Chapter> {
     private String name;
     private boolean downloaded;
     @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL)
     @MapKey(name = "number")
+    @OneToMany(cascade = CascadeType.ALL)
     private Map<Integer, Page> pages = new HashMap<>();
 
     public Chapter(String number, String name) {
         this.number = number;
         this.name = name;
-    }
-
-    @Override
-    public int compareTo(Chapter o) {
-        return Double.compare(Double.parseDouble(number), Double.parseDouble(o.number));
     }
 }

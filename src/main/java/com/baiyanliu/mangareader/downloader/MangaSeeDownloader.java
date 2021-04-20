@@ -9,6 +9,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import javax.imageio.ImageIO;
@@ -29,10 +30,12 @@ public class MangaSeeDownloader extends Downloader {
                 manga.getId(), manga.getName(), manga.getSource(), manga.getSourceId()));
         logger.log(Level.INFO, "Queuing download task", "");
         executor.submit(() -> {
+            WebDriver driver = null;
             try {
                 String url = String.format(HOME_URL, manga.getSourceId());
                 logger.log(Level.INFO, "Starting download task", String.format("URL [%s] ", url));
 
+                driver = new ChromeDriver(chromeOptions);
                 driver.get(url);
 
                 new WebDriverWait(driver, WEB_DRIVER_TIMEOUT)
@@ -57,6 +60,10 @@ public class MangaSeeDownloader extends Downloader {
                 callback.accept(manga);
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "Error encountered", "", e);
+            } finally {
+                if (driver != null) {
+                    driver.quit();
+                }
             }
         });
     }
@@ -73,9 +80,11 @@ public class MangaSeeDownloader extends Downloader {
                 manga.getId(), manga.getName(), manga.getSource(), manga.getSourceId(), chapterNumber));
         logger.log(Level.INFO, "Queuing download task", "");
         executor.submit(() -> {
+            WebDriver driver = null;
             try {
                 logger.log(Level.INFO, "Starting download task", "");
 
+                driver = new ChromeDriver(chromeOptions);
                 Chapter chapter = manga.getChapters().get(chapterNumber);
                 int pageNumber = 1;
 
@@ -132,6 +141,10 @@ public class MangaSeeDownloader extends Downloader {
                 callback.accept(chapter);
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "Error encountered", "", e);
+            } finally {
+                if (driver != null) {
+                    driver.quit();
+                }
             }
         });
     }

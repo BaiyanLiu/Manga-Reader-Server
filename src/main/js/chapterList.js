@@ -19,7 +19,9 @@ export default class ChapterList extends React.Component {
                 .then(response => response.json())
                 .then(data => {
                     this.hasLoaded = true;
-                    this.setState({chapters: data});
+                    const chapters = Object.keys(data).map(chapter => data[chapter]);
+                    chapters.sort((a, b) => parseFloat(b.number) - parseFloat(a.number));
+                    this.setState({chapters: chapters});
                 });
         }
         const collapsible = e.currentTarget.nextElementSibling.style;
@@ -31,11 +33,11 @@ export default class ChapterList extends React.Component {
     }
 
     render() {
-        const chapters = Object.keys(this.state.chapters).map(chapter =>
+        const chapters = this.state.chapters.map(chapter =>
             <Chapter
-                key={`chapter-${this.props.manga.id}-${this.state.chapters[chapter].number}`}
+                key={`chapter-${this.props.manga.id}-${chapter.number}`}
                 manga={this.props.manga}
-                chapter={this.state.chapters[chapter]}/>
+                chapter={chapter}/>
         );
         return (
             <div className="inline">
