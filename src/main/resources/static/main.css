@@ -113,7 +113,11 @@ div.chapter {
     margin: 5px 0;
 }
 
-div.chapter-controls{
+div.chapter-controls {
     display: inline;
     float: right;
+}
+
+div.chapter-new {
+    color: rgb(255, 242, 0);
 }

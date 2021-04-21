@@ -86,6 +86,7 @@ public class MangaSeeDownloader extends Downloader {
 
                 driver = new ChromeDriver(chromeOptions);
                 Chapter chapter = manga.getChapters().get(chapterNumber);
+                chapter.getPages().clear();
                 int pageNumber = 1;
 
                 while (true) {
@@ -119,7 +120,7 @@ public class MangaSeeDownloader extends Downloader {
 
                                 try {
                                     BufferedImage image = ImageIO.read(new URL(src));
-                                    page.setData(image);
+                                    page.setImage(image);
                                     chapter.getPages().put(page.getNumber(), page);
                                 } catch (IOException e) {
                                     e.printStackTrace();

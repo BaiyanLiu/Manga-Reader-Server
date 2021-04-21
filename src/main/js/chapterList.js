@@ -66,7 +66,7 @@ class Chapter extends React.Component {
     render() {
         return (
             <div className="chapter">
-                <div className="inline inline-margin">
+                <div className={"inline inline-margin" + (this.props.chapter.downloaded ? "" : " chapter-new")}>
                     {this.props.chapter.name}
                 </div>
                 <div className="chapter-controls">

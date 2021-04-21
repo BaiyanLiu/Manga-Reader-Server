@@ -21,7 +21,7 @@ public class Manga {
     private String sourceId;
     @JsonIgnore
     @MapKey(name = "number")
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private Map<String, Chapter> chapters = new HashMap<>();
 
     public Manga(String name, Source source, String sourceId) {

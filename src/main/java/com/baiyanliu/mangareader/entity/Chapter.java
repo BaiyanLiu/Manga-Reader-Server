@@ -21,7 +21,7 @@ public class Chapter {
     private boolean downloaded;
     @JsonIgnore
     @MapKey(name = "number")
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private Map<Integer, Page> pages = new HashMap<>();
 
     public Chapter(String number, String name) {

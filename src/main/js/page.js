@@ -7,7 +7,7 @@ export default class Page extends React.Component {
     constructor(props) {
         super(props);
         this.hasLoaded = false;
-        this.state = {page: {}};
+        this.state = {page: {image: {}}};
         this.pageDiv = React.createRef();
         this.handleKeyDown = this.handleKeyDown.bind(this);
         this.handleShow = this.handleShow.bind(this);
@@ -65,7 +65,7 @@ export default class Page extends React.Component {
                         <h2>Page {this.state.page.number}</h2>
                         <a href="#" onClick={this.handleHide} title="Close" className="close">X</a>
                         <div ref={this.pageDiv} className="page-image">
-                            <img src={"data:image/jpg;base64," + this.state.page.data} alt="Loading..."/>
+                            <img src={"data:image/jpg;base64," + this.state.page.image.data} alt="Loading..."/>
                         </div>
                     </div>
                 </div>
