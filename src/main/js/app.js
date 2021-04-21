@@ -9,7 +9,7 @@ class App extends React.Component {
     constructor(props) {
         super(props);
         this.root = 'api/mangas';
-        this.state = {mangas: [], links: [], fields: ['name', 'source', 'sourceId'], pageSize: 2};
+        this.state = {mangas: [], links: [], fields: ['name', 'source', 'sourceId'], pageSize: 20};
         this.home = `${this.root}?size=${encodeURIComponent(this.state.pageSize)}`;
         this.onNavigate = this.onNavigate.bind(this);
         this.onCreate = this.onCreate.bind(this);

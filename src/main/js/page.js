@@ -64,7 +64,7 @@ export default class Page extends React.Component {
                     <div className="popup page">
                         <h2>Page {this.state.page.number}</h2>
                         <a href="#" onClick={this.handleHide} title="Close" className="close">X</a>
-                        <div ref={this.pageDiv} className="page-image">
+                        <div ref={this.pageDiv} className="image">
                             <img src={"data:image/jpg;base64," + this.state.page.image.data} alt="Loading..."/>
                         </div>
                     </div>

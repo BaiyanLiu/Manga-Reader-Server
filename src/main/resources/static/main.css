@@ -4,16 +4,6 @@ body {
     font-family: Arial, sans-serif;
 }
 
-table {
-    border-collapse: collapse;
-}
-
-td, th {
-    border: 1px solid white;
-    padding: 5px;
-    vertical-align: top;
-}
-
 a.button {
     background-color: black;
     border: 1px solid white;
@@ -50,74 +40,8 @@ input {
     margin-right: 5px;
 }
 
-div.overlay {
-    background: rgba(0, 0, 0, 0.8);
-    inset: 0;
-    opacity: 0;
-    position: fixed;
-    visibility: hidden;
-}
-
-div.overlay:target {
-    opacity: 1;
-    visibility: visible;
-}
-
-div.popup {
-    border: 1px solid white;
-    border-radius: 5px;
-    margin: 50px auto;
-    padding: 16px;
-    position: relative;
-    width: 10%;
-}
-
-div.page {
-    width: 95%;
-    height: 90%;
-    position: relative;
-}
-
-div.page-image {
-    height: calc(100% - 50px);
-    overflow: auto;
-}
-
-div.page-image img {
-    width: 100%;
-}
-
-div.popup h2 {
-    margin-top: 0;
-}
-
-div.popup .close {
-    color: white;
-    text-decoration: none;
-    font-size: 25px;
-    font-weight: bold;
-    position: absolute;
-    right: 21px;
-    top: 15px;
-}
-
-div.popup .close:hover {
-    color: red;
-}
-
-div.collapsible {
-    display: none;
-}
-
-div.chapter {
-    margin: 5px 0;
-}
-
-div.chapter-controls {
-    display: inline;
-    float: right;
-}
-
-div.chapter-new {
-    color: rgb(255, 242, 0);
+hr {
+    background-color: white;
+    border-width: 0;
+    height: 1px;
 }
