@@ -26,12 +26,12 @@ div.page {
     position: relative;
 }
 
-div.page div.image {
+div.page .image {
     height: calc(100% - 50px);
     overflow: auto;
 }
 
-div.page div.image img {
+div.page .image img {
     width: 100%;
 }
 

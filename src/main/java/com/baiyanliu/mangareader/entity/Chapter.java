@@ -19,6 +19,7 @@ public class Chapter {
     private String number;
     private String name;
     private boolean downloaded;
+    private boolean read;
     @JsonIgnore
     @MapKey(name = "number")
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)

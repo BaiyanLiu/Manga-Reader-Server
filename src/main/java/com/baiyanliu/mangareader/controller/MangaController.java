@@ -4,6 +4,7 @@ import com.baiyanliu.mangareader.downloader.DownloaderDispatcher;
 import com.baiyanliu.mangareader.entity.Chapter;
 import com.baiyanliu.mangareader.entity.Manga;
 import com.baiyanliu.mangareader.entity.Page;
+import com.baiyanliu.mangareader.entity.repository.ChapterRepository;
 import com.baiyanliu.mangareader.entity.repository.MangaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -24,6 +25,7 @@ import java.util.logging.Level;
 @RequiredArgsConstructor(onConstructor = @__({@Autowired}))
 public class MangaController {
     private final MangaRepository mangaRepository;
+    private final ChapterRepository chapterRepository;
     private final DownloaderDispatcher downloaderDispatcher;
 
     @RequestMapping("/api/chapters")
@@ -45,7 +47,14 @@ public class MangaController {
         log.log(Level.INFO, String.format("getOnePage - manga [%d] chapter [%s] page [%d]", mangaId, chapterNumber, pageNumber));
         Map<String, Chapter> chapters = getAllChapters(mangaId);
         if (chapters.containsKey(chapterNumber)) {
-            return chapters.get(chapterNumber).getPages().get(pageNumber);
+            Chapter chapter = chapters.get(chapterNumber);
+            if (chapter.getPages().containsKey(pageNumber)) {
+                if (pageNumber == chapter.getPages().size()) {
+                    chapter.setRead(true);
+                    chapterRepository.save(chapter);
+                }
+                return chapter.getPages().get(pageNumber);
+            }
         }
         return null;
     }

@@ -16,11 +16,15 @@ div.chapter {
     margin: 5px 0;
 }
 
-div.chapter div.controls {
+div.chapter .controls {
     display: inline;
     float: right;
 }
 
-div.chapter div.new {
+div.chapter .new {
     color: rgb(255, 242, 0);
+}
+
+div.chapter .read {
+    color: rgb(128, 128, 128);
 }
