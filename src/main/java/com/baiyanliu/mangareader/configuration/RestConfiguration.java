@@ -1,4 +1,4 @@
-package com.baiyanliu.mangareader;
+package com.baiyanliu.mangareader.configuration;
 
 import com.baiyanliu.mangareader.entity.Manga;
 import org.springframework.context.annotation.Configuration;

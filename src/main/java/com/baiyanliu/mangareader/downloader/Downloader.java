@@ -9,7 +9,7 @@ import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 public abstract class Downloader {
-    protected static final int WEB_DRIVER_TIMEOUT = 300;
+    protected static final int WEB_DRIVER_TIMEOUT = 30;
     protected static final int PAGE_DOWNLOAD_DELAY = 2000;
 
     protected final ExecutorService executor = Executors.newSingleThreadExecutor();

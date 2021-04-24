@@ -20,6 +20,11 @@ div.popup {
     width: 10%;
 }
 
+div.popup.big {
+    width: 50%;
+    height: 90%;
+}
+
 div.page {
     width: 95%;
     height: 90%;
@@ -33,6 +38,12 @@ div.page .image {
 
 div.page .image img {
     width: 100%;
+}
+
+div.log {
+    height: calc(100% - 50px);
+    overflow: auto;
+    white-space: pre-line;
 }
 
 div.popup h2 {

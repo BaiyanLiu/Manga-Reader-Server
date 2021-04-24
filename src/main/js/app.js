@@ -3,6 +3,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import MangaList from "./mangaList";
+import DownloadLog from "./downloadLog";
 
 class App extends React.Component {
 
@@ -80,6 +81,8 @@ class App extends React.Component {
     render() {
         return (
             <div>
+                <DownloadLog/>
+                <br/>
                 <CreateDialog
                     fields={this.state.fields}
                     onCreate={this.onCreate}/>
