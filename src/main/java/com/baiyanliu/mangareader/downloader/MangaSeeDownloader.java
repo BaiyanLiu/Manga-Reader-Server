@@ -1,6 +1,8 @@
 package com.baiyanliu.mangareader.downloader;
 
 import com.baiyanliu.mangareader.CustomLogger;
+import com.baiyanliu.mangareader.downloader.messaging.DownloadPageMessage;
+import com.baiyanliu.mangareader.downloader.messaging.MessageStatus;
 import com.baiyanliu.mangareader.entity.Chapter;
 import com.baiyanliu.mangareader.entity.Manga;
 import com.baiyanliu.mangareader.entity.Page;
@@ -11,11 +13,13 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 
@@ -23,6 +27,10 @@ import java.util.logging.Level;
 public class MangaSeeDownloader extends Downloader {
     private static final String HOME_URL = "https://mangasee123.com/manga/%s";
     private static final String PAGE_URL = "https://mangasee123.com/read-online/%s-chapter-%s-page-%d.html";
+
+    public MangaSeeDownloader(SimpMessagingTemplate webSocket) {
+        super(webSocket);
+    }
 
     @Override
     public void downloadMetadata(Manga manga, Consumer<Manga> callback) {
@@ -75,7 +83,7 @@ public class MangaSeeDownloader extends Downloader {
     }
 
     @Override
-    public void downloadChapter(Manga manga, String chapterNumber, Consumer<Chapter> callback) {
+    public void downloadChapter(Manga manga, String chapterNumber, BiConsumer<Manga, Chapter> callback) {
         CustomLogger logger = new CustomLogger(log, String.format("downloadChapter - manga [%d] name [%s] source [%s] source ID [%s] chapter [%s] ",
                 manga.getId(), manga.getName(), manga.getSource(), manga.getSourceId(), chapterNumber));
         logger.log(Level.INFO, "Queuing download task", "");
@@ -106,6 +114,7 @@ public class MangaSeeDownloader extends Downloader {
                         break;
                     }
 
+                    new DownloadPageMessage(manga, MessageStatus.STARTED, chapter.getNumber(), pageNumber).send(webSocket);
                     Page page = new Page(pageNumber);
 
                     new WebDriverWait(driver, WEB_DRIVER_TIMEOUT)
@@ -129,6 +138,7 @@ public class MangaSeeDownloader extends Downloader {
                             });
 
                     logger.log(Level.INFO, "Finished downloading page", String.format("page [%d] URL [%s] ", page.getNumber(), url));
+                    new DownloadPageMessage(manga, MessageStatus.ENDED, chapter.getNumber(), pageNumber).send(webSocket);
                     pageNumber++;
                     try {
                         Thread.sleep(PAGE_DOWNLOAD_DELAY);
@@ -139,7 +149,7 @@ public class MangaSeeDownloader extends Downloader {
 
                 chapter.setDownloaded(true);
                 logger.log(Level.INFO, "Finished download task", String.format("pages [%d] ", chapter.getPages().size()));
-                callback.accept(chapter);
+                callback.accept(manga, chapter);
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "Error encountered", "", e);
             } finally {

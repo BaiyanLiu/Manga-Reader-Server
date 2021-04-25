@@ -3,9 +3,11 @@ package com.baiyanliu.mangareader.downloader;
 import com.baiyanliu.mangareader.entity.Chapter;
 import com.baiyanliu.mangareader.entity.Manga;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public abstract class Downloader {
@@ -14,14 +16,16 @@ public abstract class Downloader {
 
     protected final ExecutorService executor = Executors.newSingleThreadExecutor();
 
+    protected final SimpMessagingTemplate webSocket;
     protected final ChromeOptions chromeOptions;
 
-    protected Downloader() {
+    protected Downloader(SimpMessagingTemplate webSocket) {
+        this.webSocket = webSocket;
         chromeOptions = new ChromeOptions();
         chromeOptions.addArguments("--headless", "--disable-gpu", "--ignore-certificate-errors");
     }
 
     public abstract void downloadMetadata(Manga manga, Consumer<Manga> callback);
 
-    public abstract void downloadChapter(Manga manga, String chapterNumber, Consumer<Chapter> callback);
+    public abstract void downloadChapter(Manga manga, String chapterNumber, BiConsumer<Manga, Chapter> callback);
 }
