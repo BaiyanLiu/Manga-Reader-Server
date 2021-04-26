@@ -1,4 +1,4 @@
-package com.baiyanliu.mangareader.downloader.messaging;
+package com.baiyanliu.mangareader.messaging;
 
 import com.baiyanliu.mangareader.entity.Manga;
 import lombok.Getter;

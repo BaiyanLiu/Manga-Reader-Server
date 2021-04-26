@@ -4,6 +4,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import MangaList from "./mangaList";
 import DownloadLog from "./downloadLog";
+import ErrorLog from "./errorLog";
 
 class App extends React.Component {
 
@@ -90,6 +91,7 @@ class App extends React.Component {
         return (
             <div>
                 <DownloadLog/>
+                <ErrorLog/>
                 <br/>
                 <CreateDialog
                     fields={this.state.fields}

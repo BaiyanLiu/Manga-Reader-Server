@@ -43,6 +43,7 @@ div.page .image img {
 div.log {
     height: calc(100% - 50px);
     overflow: auto;
+    white-space: pre-line;
 }
 
 div.popup h2 {

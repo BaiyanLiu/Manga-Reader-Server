@@ -1,11 +1,12 @@
 package com.baiyanliu.mangareader.downloader;
 
 import com.baiyanliu.mangareader.CustomLogger;
-import com.baiyanliu.mangareader.downloader.messaging.DownloadPageMessage;
-import com.baiyanliu.mangareader.downloader.messaging.MessageStatus;
 import com.baiyanliu.mangareader.entity.Chapter;
 import com.baiyanliu.mangareader.entity.Manga;
 import com.baiyanliu.mangareader.entity.Page;
+import com.baiyanliu.mangareader.messaging.DownloadPageMessage;
+import com.baiyanliu.mangareader.messaging.ErrorMessage;
+import com.baiyanliu.mangareader.messaging.MessageStatus;
 import lombok.extern.java.Log;
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -68,6 +69,7 @@ public class MangaSeeDownloader extends Downloader {
                 callback.accept(manga);
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "Error encountered", "", e);
+                new ErrorMessage(e.getLocalizedMessage()).send(webSocket);
             } finally {
                 if (driver != null) {
                     driver.quit();
@@ -152,6 +154,7 @@ public class MangaSeeDownloader extends Downloader {
                 callback.accept(manga, chapter);
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "Error encountered", "", e);
+                new ErrorMessage(e.getLocalizedMessage()).send(webSocket);
             } finally {
                 if (driver != null) {
                     driver.quit();

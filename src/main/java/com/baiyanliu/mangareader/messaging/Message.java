@@ -1,17 +1,12 @@
-package com.baiyanliu.mangareader.downloader.messaging;
+package com.baiyanliu.mangareader.messaging;
 
 import com.baiyanliu.mangareader.configuration.WebSocketConfiguration;
-import com.baiyanliu.mangareader.entity.Manga;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.util.Date;
 
-@RequiredArgsConstructor
-public abstract class DownloadMessage {
-    @Getter private final Manga manga;
-    @Getter private final MessageStatus status;
+public abstract class Message {
     @Getter private final Date timestamp = new Date();
 
     public void send(SimpMessagingTemplate webSocket) {

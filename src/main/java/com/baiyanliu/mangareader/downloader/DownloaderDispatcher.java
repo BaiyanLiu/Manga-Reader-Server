@@ -1,13 +1,13 @@
 package com.baiyanliu.mangareader.downloader;
 
-import com.baiyanliu.mangareader.downloader.messaging.DownloadChapterMessage;
-import com.baiyanliu.mangareader.downloader.messaging.DownloadMetadataMessage;
-import com.baiyanliu.mangareader.downloader.messaging.MessageStatus;
 import com.baiyanliu.mangareader.entity.Chapter;
 import com.baiyanliu.mangareader.entity.Manga;
 import com.baiyanliu.mangareader.entity.Source;
 import com.baiyanliu.mangareader.entity.repository.ChapterRepository;
 import com.baiyanliu.mangareader.entity.repository.MangaRepository;
+import com.baiyanliu.mangareader.messaging.DownloadChapterMessage;
+import com.baiyanliu.mangareader.messaging.DownloadMetadataMessage;
+import com.baiyanliu.mangareader.messaging.MessageStatus;
 import com.google.common.collect.ImmutableMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
