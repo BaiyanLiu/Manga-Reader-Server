@@ -63,10 +63,10 @@ export default class DownloadLog extends React.Component {
                     url={'http://localhost:8080/events'}
                     topics={['/topic/download/page']}
                     onMessage={msg => this.onDownloadPage(msg)}/>
-                <a href="#downloadLog" className="button">Download log</a>
+                <a href="#downloadLog" className="button">Downloads</a>
                 <div id="downloadLog" className="overlay">
                     <div className="popup big">
-                        <h2>Download log</h2>
+                        <h2>Downloads</h2>
                         <a href="#" className="close">X</a>
                         <div ref={this.logDiv} className="log">
                             {this.state.messages}

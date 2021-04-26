@@ -19,7 +19,6 @@ export default class Page extends React.Component {
     }
 
     handleKeyDown(e) {
-        e.preventDefault();
         let page = this.state.page.number;
         if (e.key === "ArrowLeft" && page > 1) {
             page--;
@@ -27,6 +26,7 @@ export default class Page extends React.Component {
             page++;
         }
         if (page !== this.state.page.number) {
+            e.preventDefault()
             this.navigate(page)
         }
     }
