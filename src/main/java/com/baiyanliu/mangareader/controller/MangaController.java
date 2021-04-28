@@ -23,7 +23,7 @@ import java.util.logging.Level;
 @Log
 @RestController
 @RequiredArgsConstructor(onConstructor = @__({@Autowired}))
-public class MangaController {
+class MangaController {
     private final MangaRepository mangaRepository;
     private final ChapterRepository chapterRepository;
     private final DownloaderDispatcher downloaderDispatcher;

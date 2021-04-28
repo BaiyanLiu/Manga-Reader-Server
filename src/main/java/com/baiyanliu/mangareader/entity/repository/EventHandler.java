@@ -15,7 +15,7 @@ import java.util.logging.Level;
 @Log
 @RepositoryEventHandler
 @RequiredArgsConstructor(onConstructor = @__({@Autowired}))
-public class EventHandler {
+class EventHandler {
     private final DownloaderDispatcher downloaderDispatcher;
 
     @HandleAfterCreate

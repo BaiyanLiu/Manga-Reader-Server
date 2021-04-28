@@ -37,7 +37,7 @@ export default class DownloadLog extends React.Component {
     }
 
     formatDownloadMetadataMessage(message) {
-        return `${new Date(message.timestamp).toLocaleString()}: ${message.status === "STARTED" ? "Start" : "End"} | ${message.manga.name}`
+        return `${new Date(message.timestamp).toLocaleString()}: ${message.status === "START" ? "Start" : "End"} | ${message.manga}`
     }
 
     formatDownloadChapterMessage(message) {
