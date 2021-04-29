@@ -9,7 +9,7 @@ import javax.persistence.Entity;
 @DiscriminatorValue("Metadata")
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-class DownloadMetadataMessage extends DownloadMessage {
+public class DownloadMetadataMessage extends DownloadMessage {
 
     public DownloadMetadataMessage(String manga, MessageStatus status) {
         super(manga, status);

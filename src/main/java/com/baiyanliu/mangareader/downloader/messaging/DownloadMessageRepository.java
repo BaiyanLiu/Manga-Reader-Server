@@ -1,5 +1,5 @@
 package com.baiyanliu.mangareader.downloader.messaging;
 
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.PagingAndSortingRepository;
 
-interface DownloadMessageRepository extends CrudRepository<DownloadMessage, Long> {}
+public interface DownloadMessageRepository extends PagingAndSortingRepository<DownloadMessage, Long> {}

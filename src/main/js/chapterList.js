@@ -19,7 +19,7 @@ export default class ChapterList extends React.Component {
                 .then(response => response.json())
                 .then(data => {
                     this.hasLoaded = true;
-                    const chapters = Object.keys(data).map(chapter => data[chapter]);
+                    const chapters = Object.keys(data).map(i => data[i]);
                     chapters.sort((a, b) => parseFloat(b.number) - parseFloat(a.number));
                     this.setState({chapters: chapters});
                 });

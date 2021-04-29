@@ -13,7 +13,7 @@ import javax.persistence.Entity;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-class DownloadChapterMessage extends DownloadMessage {
+public class DownloadChapterMessage extends DownloadMessage {
     private String chapter;
 
     public DownloadChapterMessage(String manga, MessageStatus status, String chapter) {
