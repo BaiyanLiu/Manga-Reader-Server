@@ -1,7 +1,8 @@
 package com.baiyanliu.mangareader.downloader;
 
 import com.baiyanliu.mangareader.CustomLogger;
-import com.baiyanliu.mangareader.downloader.messaging.DownloadMessageFactory;
+import com.baiyanliu.mangareader.downloader.messaging.DownloadMessage;
+import com.baiyanliu.mangareader.downloader.messaging.DownloadMessageHelper;
 import com.baiyanliu.mangareader.downloader.messaging.MessageStatus;
 import com.baiyanliu.mangareader.entity.Chapter;
 import com.baiyanliu.mangareader.entity.Manga;
@@ -27,8 +28,8 @@ class MangaSeeDownloader extends Downloader {
     private static final String HOME_URL = "https://mangasee123.com/manga/%s";
     private static final String PAGE_URL = "https://mangasee123.com/read-online/%s-chapter-%s-page-%d.html";
 
-    public MangaSeeDownloader(DownloadMessageFactory downloadMessageFactory) {
-        super(downloadMessageFactory);
+    public MangaSeeDownloader(DownloadMessageHelper downloadMessageHelper) {
+        super(downloadMessageHelper);
     }
 
     @Override
@@ -36,6 +37,8 @@ class MangaSeeDownloader extends Downloader {
         CustomLogger logger = new CustomLogger(log, String.format("downloadMetadata - manga [%d] name [%s] source [%s] source ID [%s] ",
                 manga.getId(), manga.getName(), manga.getSource(), manga.getSourceId()));
         logger.log(Level.INFO, "Queuing download task", "");
+        DownloadMessage message = downloadMessageHelper.createDownloadMetadataMessage(manga);
+
         executor.submit(() -> {
             WebDriver driver = null;
             try {
@@ -64,10 +67,12 @@ class MangaSeeDownloader extends Downloader {
                 }
 
                 logger.log(Level.INFO, "Finished download task", String.format("URL [%s] chapters [%d] ", url, manga.getChapters().size()));
+                downloadMessageHelper.updateStatus(message, MessageStatus.END);
+
                 callback.accept(manga);
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "Error encountered", "", e);
-                downloadMessageFactory.createErrorMessage(e.getLocalizedMessage());
+                downloadMessageHelper.createErrorMessage(e.getLocalizedMessage());
             } finally {
                 if (driver != null) {
                     driver.quit();
@@ -87,6 +92,8 @@ class MangaSeeDownloader extends Downloader {
         CustomLogger logger = new CustomLogger(log, String.format("downloadChapter - manga [%d] name [%s] source [%s] source ID [%s] chapter [%s] ",
                 manga.getId(), manga.getName(), manga.getSource(), manga.getSourceId(), chapterNumber));
         logger.log(Level.INFO, "Queuing download task", "");
+        DownloadMessage downloadChapterMessage = downloadMessageHelper.createDownloadChapterMessage(manga, chapterNumber);
+
         executor.submit(() -> {
             WebDriver driver = null;
             try {
@@ -114,7 +121,7 @@ class MangaSeeDownloader extends Downloader {
                         break;
                     }
 
-                    downloadMessageFactory.createDownloadPageMessage(manga, MessageStatus.START, chapter.getNumber(), pageNumber);
+                    DownloadMessage downloadPageMessage = downloadMessageHelper.createDownloadPageMessage(manga, chapter.getNumber(), pageNumber);
                     Page page = new Page(pageNumber);
 
                     new WebDriverWait(driver, WEB_DRIVER_TIMEOUT)
@@ -138,7 +145,8 @@ class MangaSeeDownloader extends Downloader {
                             });
 
                     logger.log(Level.INFO, "Finished downloading page", String.format("page [%d] URL [%s] ", page.getNumber(), url));
-                    downloadMessageFactory.createDownloadPageMessage(manga, MessageStatus.END, chapter.getNumber(), pageNumber);
+                    downloadMessageHelper.updateStatus(downloadPageMessage, MessageStatus.END);
+
                     pageNumber++;
                     try {
                         Thread.sleep(PAGE_DOWNLOAD_DELAY);
@@ -149,10 +157,12 @@ class MangaSeeDownloader extends Downloader {
 
                 chapter.setDownloaded(true);
                 logger.log(Level.INFO, "Finished download task", String.format("pages [%d] ", chapter.getPages().size()));
+                downloadMessageHelper.updateStatus(downloadChapterMessage, MessageStatus.END);
+
                 callback.accept(manga, chapter);
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "Error encountered", "", e);
-                downloadMessageFactory.createErrorMessage(e.getLocalizedMessage());
+                downloadMessageHelper.createErrorMessage(e.getLocalizedMessage());
             } finally {
                 if (driver != null) {
                     driver.quit();

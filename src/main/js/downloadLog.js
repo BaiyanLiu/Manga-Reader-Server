@@ -53,9 +53,11 @@ export default class DownloadLog extends React.Component {
             return;
         }
         const messages = this.state.messages;
-        messages[message.id] = message;
         const messageIds = this.state.messageIds;
-        messageIds.push(message.id);
+        if (!(message.id in messages)) {
+            messageIds.push(message.id);
+        }
+        messages[message.id] = message;
         this.setState({messages: messages, messageIds: messageIds});
     }
 
@@ -82,9 +84,7 @@ export default class DownloadLog extends React.Component {
     }
 
     render() {
-        const messages = this.state.messageIds.map(id => {
-            return <div>{new Date(this.state.messages[id].timestamp).toLocaleString()}: {this.formatMessage(this.state.messages[id])}</div>
-        })
+        const messages = this.state.messageIds.map(id => <div>{this.formatMessage(this.state.messages[id])}</div>);
         return (
             <div>
                 <SockJsClient

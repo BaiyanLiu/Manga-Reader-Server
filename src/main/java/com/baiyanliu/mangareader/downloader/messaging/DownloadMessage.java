@@ -19,7 +19,7 @@ import java.util.Date;
 @Inheritance
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @RestResource(path="downloadMessages")
-abstract class DownloadMessage extends Message {
+public abstract class DownloadMessage extends Message {
     @GeneratedValue(generator = "downloadMessageId") @Id private long id;
 
     private String manga;

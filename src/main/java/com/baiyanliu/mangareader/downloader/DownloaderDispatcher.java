@@ -1,7 +1,6 @@
 package com.baiyanliu.mangareader.downloader;
 
-import com.baiyanliu.mangareader.downloader.messaging.DownloadMessageFactory;
-import com.baiyanliu.mangareader.downloader.messaging.MessageStatus;
+import com.baiyanliu.mangareader.downloader.messaging.DownloadMessageHelper;
 import com.baiyanliu.mangareader.entity.Chapter;
 import com.baiyanliu.mangareader.entity.Manga;
 import com.baiyanliu.mangareader.entity.Source;
@@ -19,36 +18,29 @@ public class DownloaderDispatcher {
 
     private final MangaRepository mangaRepository;
     private final ChapterRepository chapterRepository;
-    private final DownloadMessageFactory downloadMessageFactory;
 
     @Autowired
-    public DownloaderDispatcher(MangaRepository mangaRepository, ChapterRepository chapterRepository, DownloadMessageFactory downloadMessageFactory) {
+    public DownloaderDispatcher(MangaRepository mangaRepository, ChapterRepository chapterRepository, DownloadMessageHelper downloadMessageHelper) {
         this.mangaRepository = mangaRepository;
         this.chapterRepository = chapterRepository;
-        this.downloadMessageFactory = downloadMessageFactory;
-
         downloaders = ImmutableMap.of(
-                Source.MANGA_SEE, new MangaSeeDownloader(downloadMessageFactory)
+                Source.MANGA_SEE, new MangaSeeDownloader(downloadMessageHelper)
         );
     }
 
     public void downloadMetadata(Manga manga) {
-        downloadMessageFactory.createDownloadMetadataMessage(manga, MessageStatus.START);
         downloaders.get(manga.getSource()).downloadMetadata(manga, this::onMetadataDownloaded);
     }
 
     private void onMetadataDownloaded(Manga manga) {
         mangaRepository.save(manga);
-        downloadMessageFactory.createDownloadMetadataMessage(manga, MessageStatus.END);
     }
 
     public void downloadChapter(Manga manga, String chapterNumber) {
-        downloadMessageFactory.createDownloadChapterMessage(manga, MessageStatus.START, chapterNumber);
         downloaders.get(manga.getSource()).downloadChapter(manga, chapterNumber, this::onChapterDownloaded);
     }
 
     private void onChapterDownloaded(Manga manga, Chapter chapter) {
         chapterRepository.save(chapter);
-        downloadMessageFactory.createDownloadChapterMessage(manga, MessageStatus.END, chapter.getNumber());
     }
 }

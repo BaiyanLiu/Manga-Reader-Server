@@ -1,6 +1,6 @@
 package com.baiyanliu.mangareader.downloader;
 
-import com.baiyanliu.mangareader.downloader.messaging.DownloadMessageFactory;
+import com.baiyanliu.mangareader.downloader.messaging.DownloadMessageHelper;
 import com.baiyanliu.mangareader.entity.Chapter;
 import com.baiyanliu.mangareader.entity.Manga;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -16,11 +16,11 @@ abstract class Downloader {
 
     protected final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-    protected final DownloadMessageFactory downloadMessageFactory;
+    protected final DownloadMessageHelper downloadMessageHelper;
     protected final ChromeOptions chromeOptions;
 
-    protected Downloader(DownloadMessageFactory downloadMessageFactory) {
-        this.downloadMessageFactory = downloadMessageFactory;
+    protected Downloader(DownloadMessageHelper downloadMessageHelper) {
+        this.downloadMessageHelper = downloadMessageHelper;
         chromeOptions = new ChromeOptions();
         chromeOptions.addArguments("--headless", "--disable-gpu", "--ignore-certificate-errors");
     }
