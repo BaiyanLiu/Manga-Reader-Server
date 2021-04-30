@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.springframework.data.rest.core.annotation.RestResource;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -17,6 +18,7 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = false)
 @Inheritance
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@RestResource(path="downloadMessages")
 abstract class DownloadMessage extends Message {
     @GeneratedValue(generator = "downloadMessageId") @Id private long id;
 
@@ -27,5 +29,10 @@ abstract class DownloadMessage extends Message {
         super(new Date());
         this.manga = manga;
         this.status = status;
+    }
+
+    @Override
+    protected String getDestination() {
+        return "/download";
     }
 }

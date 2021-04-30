@@ -14,9 +14,4 @@ public class DownloadMetadataMessage extends DownloadMessage {
     public DownloadMetadataMessage(String manga, MessageStatus status) {
         super(manga, status);
     }
-
-    @Override
-    protected String getDestination() {
-        return "/download/metadata";
-    }
 }

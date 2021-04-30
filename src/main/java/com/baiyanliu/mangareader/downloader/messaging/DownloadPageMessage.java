@@ -20,9 +20,4 @@ public class DownloadPageMessage extends DownloadChapterMessage {
         super(manga, status, chapter);
         this.page = page;
     }
-
-    @Override
-    protected String getDestination() {
-        return "/download/page";
-    }
 }

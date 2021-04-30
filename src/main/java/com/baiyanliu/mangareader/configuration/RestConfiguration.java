@@ -16,7 +16,6 @@ class RestConfiguration implements RepositoryRestConfigurer {
     @Override
     public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config, CorsRegistry cors) {
         config.exposeIdsFor(Manga.class);
-        config.exposeIdsFor(ErrorMessage.class);
         config.exposeIdsFor(DownloadMetadataMessage.class);
         config.exposeIdsFor(DownloadChapterMessage.class);
         config.exposeIdsFor(DownloadPageMessage.class);

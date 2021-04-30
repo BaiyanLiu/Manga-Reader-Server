@@ -8,7 +8,7 @@ export default class ErrorLog extends React.Component {
     constructor(props) {
         super(props);
         this.hasLoaded = false;
-        this.state = {messages: [], pageSize: 20};
+        this.state = {messages: [], pageSize: 100};
         this.logDiv = React.createRef();
         this.handleShow = this.handleShow.bind(this);
         this.onMessage = this.onMessage.bind(this);
@@ -28,7 +28,7 @@ export default class ErrorLog extends React.Component {
                     const messages = Object.keys(data._embedded.errorMessages).map(i => {
                         return data._embedded.errorMessages[i]
                     });
-                    messages.sort((a, b) => a.id - b.id);
+                    messages.reverse();
                     this.setState({messages: messages});
                 });
         }

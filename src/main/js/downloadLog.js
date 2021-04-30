@@ -7,33 +7,66 @@ export default class DownloadLog extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {messages: []};
+        this.hasLoaded = false;
+        this.state = {messages: {}, messageIds: [], pageSize: 100};
         this.logDiv = React.createRef();
-        this.onDownloadMetadata = this.onDownloadMetadata.bind(this);
-        this.onDownloadChapter = this.onDownloadChapter.bind(this);
-        this.onDownloadPage = this.onDownloadPage.bind(this);
+        this.handleShow = this.handleShow.bind(this);
+        this.onMessage = this.onMessage.bind(this);
     }
 
     componentDidUpdate() {
         this.logDiv.current.scrollTop = this.logDiv.current.scrollHeight;
     }
 
-    onDownloadMetadata(message) {
-        const messages = this.state.messages;
-        messages.push(<div>{this.formatDownloadMetadataMessage(message)}</div>);
-        this.setState({messages: messages});
+    handleShow(e) {
+        e.preventDefault();
+        if (!this.hasLoaded) {
+            fetch(`api/downloadMessages?sort=id,desc&size=${this.state.pageSize}`)
+                .then(response => response.json())
+                .then(data => {
+                    this.hasLoaded = true;
+                    const messages = {}
+                    this.addMessages(messages, data._embedded.downloadMetadataMessages);
+                    this.addMessages(messages, data._embedded.downloadChapterMessages);
+                    this.addMessages(messages, data._embedded.downloadPageMessages);
+                    const messageIds = []
+                    Object.keys(messages).map(i => {
+                        messageIds.push(messages[i].id);
+                    });
+                    messageIds.sort((a, b) => parseInt(a) - parseInt(b));
+                    this.setState({messages: messages, messageIds: messageIds});
+                });
+        }
+        window.location = e.currentTarget.href;
     }
 
-    onDownloadChapter(message) {
-        const messages = this.state.messages;
-        messages.push(<div>{this.formatDownloadChapterMessage(message)}</div>);
-        this.setState({messages: messages});
+    addMessages(messages, data) {
+        if (data) {
+            Object.keys(data).map(i => {
+                messages[data[i].id] = data[i]
+            });
+        }
     }
 
-    onDownloadPage(message) {
+    onMessage(message) {
+        if (!this.hasLoaded) {
+            return;
+        }
         const messages = this.state.messages;
-        messages.push(<div>{this.formatDownloadPageMessage(message)}</div>);
-        this.setState({messages: messages});
+        messages[message.id] = message;
+        const messageIds = this.state.messageIds;
+        messageIds.push(message.id);
+        this.setState({messages: messages, messageIds: messageIds});
+    }
+
+    formatMessage(message) {
+        if (message.page) {
+            return this.formatDownloadPageMessage(message);
+        } else if (message.chapter) {
+            return this.formatDownloadChapterMessage(message);
+        } else {
+            return this.formatDownloadMetadataMessage(message);
+        }
     }
 
     formatDownloadMetadataMessage(message) {
@@ -49,27 +82,22 @@ export default class DownloadLog extends React.Component {
     }
 
     render() {
+        const messages = this.state.messageIds.map(id => {
+            return <div>{new Date(this.state.messages[id].timestamp).toLocaleString()}: {this.formatMessage(this.state.messages[id])}</div>
+        })
         return (
             <div>
                 <SockJsClient
                     url={'http://localhost:8080/events'}
-                    topics={['/topic/download/metadata']}
-                    onMessage={msg => this.onDownloadMetadata(msg)}/>
-                <SockJsClient
-                    url={'http://localhost:8080/events'}
-                    topics={['/topic/download/chapter']}
-                    onMessage={msg => this.onDownloadChapter(msg)}/>
-                <SockJsClient
-                    url={'http://localhost:8080/events'}
-                    topics={['/topic/download/page']}
-                    onMessage={msg => this.onDownloadPage(msg)}/>
-                <a href="#downloadLog" className="button inline inline-margin float-left">Downloads</a>
+                    topics={['/topic/download']}
+                    onMessage={msg => this.onMessage(msg)}/>
+                <a href="#downloadLog" onClick={this.handleShow} className="button inline inline-margin float-left">Downloads</a>
                 <div id="downloadLog" className="overlay">
                     <div className="popup big">
                         <h2>Downloads</h2>
                         <a href="#" className="close">X</a>
                         <div ref={this.logDiv} className="log">
-                            {this.state.messages}
+                            {messages}
                         </div>
                     </div>
                 </div>
