@@ -1,16 +1,15 @@
 package com.baiyanliu.mangareader.downloader.messaging;
 
+import com.baiyanliu.mangareader.entity.Manga;
 import com.baiyanliu.mangareader.messaging.Message;
+import com.fasterxml.jackson.annotation.JsonGetter;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.data.rest.core.annotation.RestResource;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
+import javax.persistence.*;
 import java.util.Date;
 
 @Data
@@ -22,13 +21,19 @@ import java.util.Date;
 public abstract class DownloadMessage extends Message {
     @GeneratedValue(generator = "downloadMessageId") @Id private long id;
 
-    private String manga;
+    @ManyToOne private Manga manga;
     private MessageStatus status;
 
-    public DownloadMessage(String manga, MessageStatus status) {
+    public DownloadMessage(Manga manga, MessageStatus status) {
         super(new Date());
         this.manga = manga;
         this.status = status;
+    }
+
+    @JsonGetter(value = "mangaName")
+    @Transient
+    public String getMangaName() {
+        return manga.getName();
     }
 
     @Override

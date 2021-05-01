@@ -1,5 +1,6 @@
 package com.baiyanliu.mangareader.downloader.messaging;
 
+import com.baiyanliu.mangareader.entity.Manga;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -16,7 +17,7 @@ import javax.persistence.Entity;
 public class DownloadPageMessage extends DownloadChapterMessage {
     private int page;
 
-    public DownloadPageMessage(String manga, MessageStatus status, String chapter, int page) {
+    public DownloadPageMessage(Manga manga, MessageStatus status, String chapter, int page) {
         super(manga, status, chapter);
         this.page = page;
     }

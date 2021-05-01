@@ -20,19 +20,19 @@ public class DownloadMessageHelper extends MessageFactory {
     }
 
     public DownloadMessage createDownloadMetadataMessage(Manga manga) {
-        DownloadMessage message = new DownloadMetadataMessage(manga.getName(), MessageStatus.START);
+        DownloadMessage message = new DownloadMetadataMessage(manga, MessageStatus.START);
         saveAndSend(message);
         return message;
     }
 
     public DownloadMessage createDownloadChapterMessage(Manga manga, String chapterNumber) {
-        DownloadMessage message = new DownloadChapterMessage(manga.getName(), MessageStatus.START, chapterNumber);
+        DownloadMessage message = new DownloadChapterMessage(manga, MessageStatus.START, chapterNumber);
         saveAndSend(message);
         return message;
     }
 
     public DownloadMessage createDownloadPageMessage(Manga manga, String chapterNumber, int pageNumber) {
-        DownloadMessage message = new DownloadPageMessage(manga.getName(), MessageStatus.START, chapterNumber, pageNumber);
+        DownloadMessage message = new DownloadPageMessage(manga, MessageStatus.START, chapterNumber, pageNumber);
         saveAndSend(message);
         return message;
     }

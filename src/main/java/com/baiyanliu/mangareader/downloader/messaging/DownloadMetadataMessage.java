@@ -1,5 +1,6 @@
 package com.baiyanliu.mangareader.downloader.messaging;
 
+import com.baiyanliu.mangareader.entity.Manga;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -11,7 +12,7 @@ import javax.persistence.Entity;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class DownloadMetadataMessage extends DownloadMessage {
 
-    public DownloadMetadataMessage(String manga, MessageStatus status) {
+    public DownloadMetadataMessage(Manga manga, MessageStatus status) {
         super(manga, status);
     }
 }
