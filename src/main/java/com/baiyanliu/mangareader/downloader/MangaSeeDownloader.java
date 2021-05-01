@@ -19,6 +19,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.logging.Level;
@@ -105,21 +106,9 @@ class MangaSeeDownloader extends Downloader {
                 int pageNumber = 1;
 
                 while (true) {
-                    logger.log(Level.INFO, "Starting to download page", String.format("page [%d] ", pageNumber));
-
-                    if (chapter.getPages().containsKey(pageNumber)) {
-                        pageNumber++;
-                        continue;
-                    }
-
                     String url = String.format(PAGE_URL, manga.getSourceId(), chapterNumber, pageNumber);
-                    logger.log(Level.INFO, "Downloading page", String.format("page [%d] URL [%s] ", pageNumber, url));
-
+                    logger.log(Level.INFO, "Downloading page", String.format("page [%d] pages [%d] URL [%s] ", pageNumber, chapter.getLastPage(), url));
                     driver.get(String.format(PAGE_URL, manga.getSourceId(), chapterNumber, pageNumber));
-                    if ("404 Page Not Found".equals(driver.getTitle())) {
-                        logger.log(Level.INFO, "Reached last page", String.format("page [%d] URL [%s] ", pageNumber, url));
-                        break;
-                    }
 
                     DownloadMessage downloadPageMessage = downloadMessageHelper.createDownloadPageMessage(manga, chapter.getNumber(), pageNumber);
                     Page page = new Page(pageNumber);
@@ -127,12 +116,20 @@ class MangaSeeDownloader extends Downloader {
                     new WebDriverWait(driver, WEB_DRIVER_TIMEOUT)
                             .ignoring(StaleElementReferenceException.class)
                             .until((WebDriver d) -> {
-                                logger.log(Level.INFO, "Waiting for elements to load", String.format("page [%d] URL [%s] ", page.getNumber(), url));
+                                logger.log(Level.INFO, "Waiting for elements to load", String.format("page [%d] pages [%d] URL [%s] ", page.getNumber(), chapter.getLastPage(), url));
+
+                                if (page.getNumber() == 1) {
+                                    d.findElement(By.cssSelector("button[data-target='#PageModal']")).click();
+                                    List<WebElement> elements = d.findElements(By.cssSelector("button[ng-click='vm.GoToPage(Page)'"));
+                                    chapter.setLastPage(elements.size());
+                                }
+
                                 String src = d.findElement(By.className("img-fluid")).getAttribute("src");
                                 if (src == null) {
                                     return false;
                                 }
-                                logger.log(Level.INFO, "Elements loaded", String.format("page [%d] URL [%s] ", page.getNumber(), url));
+
+                                logger.log(Level.INFO, "Elements loaded", String.format("page [%d] pages [%d] URL [%s] ", page.getNumber(), chapter.getLastPage(), url));
 
                                 try {
                                     BufferedImage image = ImageIO.read(new URL(src));
@@ -144,9 +141,12 @@ class MangaSeeDownloader extends Downloader {
                                 return true;
                             });
 
-                    logger.log(Level.INFO, "Finished downloading page", String.format("page [%d] URL [%s] ", page.getNumber(), url));
+                    logger.log(Level.INFO, "Finished downloading page", String.format("page [%d] pages [%d] URL [%s] ", page.getNumber(), chapter.getLastPage(), url));
                     downloadMessageHelper.updateStatus(downloadPageMessage, MessageStatus.END);
 
+                    if (pageNumber == chapter.getLastPage()) {
+                        break;
+                    }
                     pageNumber++;
                     try {
                         Thread.sleep(PAGE_DOWNLOAD_DELAY);
@@ -156,7 +156,7 @@ class MangaSeeDownloader extends Downloader {
                 }
 
                 chapter.setDownloaded(true);
-                logger.log(Level.INFO, "Finished download task", String.format("pages [%d] ", chapter.getPages().size()));
+                logger.log(Level.INFO, "Finished download task", String.format("pages [%d] ", chapter.getLastPage()));
                 downloadMessageHelper.updateStatus(downloadChapterMessage, MessageStatus.END);
 
                 callback.accept(manga, chapter);

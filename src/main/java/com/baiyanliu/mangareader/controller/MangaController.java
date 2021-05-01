@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.transaction.Transactional;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
@@ -39,7 +38,6 @@ class MangaController {
     }
 
     @RequestMapping("/api/page")
-    @Transactional
     public Page getOnePage(
             @RequestParam("manga") Long mangaId,
             @RequestParam("chapter") String chapterNumber,
@@ -49,7 +47,7 @@ class MangaController {
         if (chapters.containsKey(chapterNumber)) {
             Chapter chapter = chapters.get(chapterNumber);
             if (chapter.getPages().containsKey(pageNumber)) {
-                if (pageNumber == chapter.getPages().size()) {
+                if (pageNumber == chapter.getLastPage()) {
                     chapter.setRead(true);
                     chapterRepository.save(chapter);
                 }

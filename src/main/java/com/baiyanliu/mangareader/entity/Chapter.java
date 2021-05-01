@@ -18,6 +18,7 @@ public class Chapter {
 
     private String number;
     private String name;
+    private int lastPage;
     private boolean downloaded;
     private boolean read;
     @JsonIgnore
