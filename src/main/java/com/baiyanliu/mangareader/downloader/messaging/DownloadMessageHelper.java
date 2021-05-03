@@ -7,8 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-
 @Component
 public class DownloadMessageHelper extends MessageFactory {
     private final DownloadMessageRepository downloadMessageRepository;
@@ -20,26 +18,19 @@ public class DownloadMessageHelper extends MessageFactory {
     }
 
     public DownloadMessage createDownloadMetadataMessage(Manga manga) {
-        DownloadMessage message = new DownloadMetadataMessage(manga, MessageStatus.START);
+        DownloadMessage message = new DownloadMetadataMessage(manga);
         saveAndSend(message);
         return message;
     }
 
     public DownloadMessage createDownloadChapterMessage(Manga manga, String chapterNumber) {
-        DownloadMessage message = new DownloadChapterMessage(manga, MessageStatus.START, chapterNumber);
+        DownloadMessage message = new DownloadChapterMessage(manga, chapterNumber);
         saveAndSend(message);
         return message;
     }
 
-    public DownloadMessage createDownloadPageMessage(Manga manga, String chapterNumber, int pageNumber) {
-        DownloadMessage message = new DownloadPageMessage(manga, MessageStatus.START, chapterNumber, pageNumber);
-        saveAndSend(message);
-        return message;
-    }
-
-    public void updateStatus(DownloadMessage message, MessageStatus status) {
-        message.setStatus(status);
-        message.setTimestamp(new Date());
+    public void updateCompleted(DownloadMessage message, int completed) {
+        message.setCompleted(completed);
         saveAndSend(message);
     }
 

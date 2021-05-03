@@ -12,7 +12,7 @@ import javax.persistence.Entity;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class DownloadMetadataMessage extends DownloadMessage {
 
-    public DownloadMetadataMessage(Manga manga, MessageStatus status) {
-        super(manga, status);
+    public DownloadMetadataMessage(Manga manga) {
+        super(manga);
     }
 }

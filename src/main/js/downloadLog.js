@@ -28,7 +28,6 @@ export default class DownloadLog extends React.Component {
                     const messages = {}
                     this.addMessages(messages, data._embedded.downloadMetadataMessages);
                     this.addMessages(messages, data._embedded.downloadChapterMessages);
-                    this.addMessages(messages, data._embedded.downloadPageMessages);
                     const messageIds = []
                     Object.keys(messages).map(i => {
                         messageIds.push(messages[i].id);
@@ -62,25 +61,13 @@ export default class DownloadLog extends React.Component {
     }
 
     formatMessage(message) {
-        if (message.page) {
-            return this.formatDownloadPageMessage(message);
-        } else if (message.chapter) {
-            return this.formatDownloadChapterMessage(message);
+        const header = `${new Date(message.timestamp).toLocaleString()}: ${message.mangaName}`;
+        const footer = ` | ${message.completed} of ${message.total}`
+        if (message.chapter) {
+            return header + ` | Chapter ${message.chapter}` + footer;
         } else {
-            return this.formatDownloadMetadataMessage(message);
+            return header + footer;
         }
-    }
-
-    formatDownloadMetadataMessage(message) {
-        return `${new Date(message.timestamp).toLocaleString()}: ${message.status === "START" ? "Start" : "End"} | ${message.mangaName}`
-    }
-
-    formatDownloadChapterMessage(message) {
-        return `${this.formatDownloadMetadataMessage(message)} | Chapter ${message.chapter}`
-    }
-
-    formatDownloadPageMessage(message) {
-        return `${this.formatDownloadChapterMessage(message)} | Page ${message.page}`
     }
 
     render() {

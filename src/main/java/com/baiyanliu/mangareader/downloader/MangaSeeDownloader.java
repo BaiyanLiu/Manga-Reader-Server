@@ -3,7 +3,6 @@ package com.baiyanliu.mangareader.downloader;
 import com.baiyanliu.mangareader.CustomLogger;
 import com.baiyanliu.mangareader.downloader.messaging.DownloadMessage;
 import com.baiyanliu.mangareader.downloader.messaging.DownloadMessageHelper;
-import com.baiyanliu.mangareader.downloader.messaging.MessageStatus;
 import com.baiyanliu.mangareader.entity.Chapter;
 import com.baiyanliu.mangareader.entity.Manga;
 import com.baiyanliu.mangareader.entity.Page;
@@ -68,7 +67,7 @@ class MangaSeeDownloader extends Downloader {
                 }
 
                 logger.log(Level.INFO, "Finished download task", String.format("URL [%s] chapters [%d] ", url, manga.getChapters().size()));
-                downloadMessageHelper.updateStatus(message, MessageStatus.END);
+                downloadMessageHelper.updateCompleted(message, 1);
 
                 callback.accept(manga);
             } catch (Exception e) {
@@ -110,7 +109,6 @@ class MangaSeeDownloader extends Downloader {
                     logger.log(Level.INFO, "Downloading page", String.format("page [%d] pages [%d] URL [%s] ", pageNumber, chapter.getLastPage(), url));
                     driver.get(String.format(PAGE_URL, manga.getSourceId(), chapterNumber, pageNumber));
 
-                    DownloadMessage downloadPageMessage = downloadMessageHelper.createDownloadPageMessage(manga, chapter.getNumber(), pageNumber);
                     Page page = new Page(pageNumber);
 
                     new WebDriverWait(driver, WEB_DRIVER_TIMEOUT)
@@ -122,6 +120,7 @@ class MangaSeeDownloader extends Downloader {
                                     d.findElement(By.cssSelector("button[data-target='#PageModal']")).click();
                                     List<WebElement> elements = d.findElements(By.cssSelector("button[ng-click='vm.GoToPage(Page)'"));
                                     chapter.setLastPage(elements.size());
+                                    downloadChapterMessage.setTotal(elements.size());
                                 }
 
                                 String src = d.findElement(By.className("img-fluid")).getAttribute("src");
@@ -141,8 +140,8 @@ class MangaSeeDownloader extends Downloader {
                                 return true;
                             });
 
-                    logger.log(Level.INFO, "Finished downloading page", String.format("page [%d] pages [%d] URL [%s] ", page.getNumber(), chapter.getLastPage(), url));
-                    downloadMessageHelper.updateStatus(downloadPageMessage, MessageStatus.END);
+                    logger.log(Level.INFO, "Finished downloading page", String.format("page [%d] pages [%d] URL [%s] ", pageNumber, chapter.getLastPage(), url));
+                    downloadMessageHelper.updateCompleted(downloadChapterMessage, pageNumber);
 
                     if (pageNumber == chapter.getLastPage()) {
                         break;
@@ -157,7 +156,6 @@ class MangaSeeDownloader extends Downloader {
 
                 chapter.setDownloaded(true);
                 logger.log(Level.INFO, "Finished download task", String.format("pages [%d] ", chapter.getLastPage()));
-                downloadMessageHelper.updateStatus(downloadChapterMessage, MessageStatus.END);
 
                 callback.accept(manga, chapter);
             } catch (Exception e) {

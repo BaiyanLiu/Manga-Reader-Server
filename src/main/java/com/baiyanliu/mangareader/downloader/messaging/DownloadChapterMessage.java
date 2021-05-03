@@ -17,8 +17,8 @@ import javax.persistence.Entity;
 public class DownloadChapterMessage extends DownloadMessage {
     private String chapter;
 
-    public DownloadChapterMessage(Manga manga, MessageStatus status, String chapter) {
-        super(manga, status);
+    public DownloadChapterMessage(Manga manga, String chapter) {
+        super(manga);
         this.chapter = chapter;
     }
 }

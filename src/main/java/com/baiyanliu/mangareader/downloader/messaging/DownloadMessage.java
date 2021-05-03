@@ -22,12 +22,13 @@ public abstract class DownloadMessage extends Message {
     @GeneratedValue(generator = "downloadMessageId") @Id private long id;
 
     @ManyToOne private Manga manga;
-    private MessageStatus status;
+    private int total;
+    private int completed;
 
-    public DownloadMessage(Manga manga, MessageStatus status) {
+    public DownloadMessage(Manga manga) {
         super(new Date());
         this.manga = manga;
-        this.status = status;
+        total = 1;
     }
 
     @JsonGetter(value = "mangaName")
