@@ -25,10 +25,10 @@ export default class DownloadLog extends React.Component {
                 .then(response => response.json())
                 .then(data => {
                     this.hasLoaded = true;
-                    const messages = {}
+                    const messages = {};
                     this.addMessages(messages, data._embedded.downloadMetadataMessages);
                     this.addMessages(messages, data._embedded.downloadChapterMessages);
-                    const messageIds = []
+                    const messageIds = [];
                     Object.keys(messages).map(i => {
                         messageIds.push(messages[i].id);
                     });
@@ -42,7 +42,7 @@ export default class DownloadLog extends React.Component {
     addMessages(messages, data) {
         if (data) {
             Object.keys(data).map(i => {
-                messages[data[i].id] = data[i]
+                messages[data[i].id] = data[i];
             });
         }
     }
@@ -62,7 +62,7 @@ export default class DownloadLog extends React.Component {
 
     formatMessage(message) {
         const header = `${new Date(message.timestamp).toLocaleString()}: ${message.mangaName}`;
-        const footer = ` | ${message.completed} of ${message.total}`
+        const footer = ` | ${message.completed} of ${message.total}`;
         if (message.chapter) {
             return header + ` | Chapter ${message.chapter}` + footer;
         } else {
@@ -70,8 +70,16 @@ export default class DownloadLog extends React.Component {
         }
     }
 
+    addControls(message) {
+        if (message.completed !== message.total) {
+            return <a className="button inline float-right negative" onClick={() => fetch(`api/cancelDownload?id=${message.id}`).then(() => {})}>Cancel</a>;
+        }
+    }
+
     render() {
-        const messages = this.state.messageIds.map(id => <div>{this.formatMessage(this.state.messages[id])}</div>);
+        const messages = this.state.messageIds.map(id => {
+            return <div className="log-line">{this.formatMessage(this.state.messages[id])}{this.addControls(this.state.messages[id])}</div>;
+        });
         return (
             <div>
                 <SockJsClient

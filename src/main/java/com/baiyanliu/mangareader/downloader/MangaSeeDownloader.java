@@ -7,10 +7,7 @@ import com.baiyanliu.mangareader.entity.Chapter;
 import com.baiyanliu.mangareader.entity.Manga;
 import com.baiyanliu.mangareader.entity.Page;
 import lombok.extern.java.Log;
-import org.openqa.selenium.By;
-import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -19,6 +16,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.util.concurrent.Future;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.logging.Level;
@@ -28,8 +26,8 @@ class MangaSeeDownloader extends Downloader {
     private static final String HOME_URL = "https://mangasee123.com/manga/%s";
     private static final String PAGE_URL = "https://mangasee123.com/read-online/%s-chapter-%s-page-%d.html";
 
-    public MangaSeeDownloader(DownloadMessageHelper downloadMessageHelper) {
-        super(downloadMessageHelper);
+    public MangaSeeDownloader(DownloadMessageHelper downloadMessageHelper, TaskManager taskManager) {
+        super(downloadMessageHelper, taskManager);
     }
 
     @Override
@@ -39,23 +37,27 @@ class MangaSeeDownloader extends Downloader {
         logger.log(Level.INFO, "Queuing download task", "");
         DownloadMessage message = downloadMessageHelper.createDownloadMetadataMessage(manga);
 
-        executor.submit(() -> {
+        Future<Void> task = executor.submit(() -> {
             WebDriver driver = null;
             try {
                 String url = String.format(HOME_URL, manga.getSourceId());
                 logger.log(Level.INFO, "Starting download task", String.format("URL [%s] ", url));
 
-                driver = new ChromeDriver(chromeOptions);
+                driver = new ChromeDriver(chromeDriverService, chromeOptions);
                 driver.get(url);
 
-                new WebDriverWait(driver, WEB_DRIVER_TIMEOUT)
-                        .ignoring(StaleElementReferenceException.class)
-                        .until((WebDriver d) -> {
-                            logger.log(Level.INFO, "Waiting for elements to load", String.format("URL [%s] ", url));
-                            d.findElement(By.className("ShowAllChapters")).click();
-                            logger.log(Level.INFO, "Elements loaded", String.format("URL [%s] ", url));
-                            return true;
-                        });
+                try {
+                    new WebDriverWait(driver, WEB_DRIVER_TIMEOUT)
+                            .ignoring(StaleElementReferenceException.class)
+                            .until((WebDriver d) -> {
+                                logger.log(Level.INFO, "Waiting for elements to load", String.format("URL [%s] ", url));
+                                d.findElement(By.className("ShowAllChapters")).click();
+                                logger.log(Level.INFO, "Elements loaded", String.format("URL [%s] ", url));
+                                return true;
+                            });
+                } catch (WebDriverException e) {
+                    throw (e.getCause() instanceof InterruptedException ? (InterruptedException) e.getCause() : e);
+                }
 
                 for (WebElement c : driver.findElements(By.className("ChapterLink"))) {
                     String chapterNumber = extractChapterNumber(c.getAttribute("href"));
@@ -70,15 +72,20 @@ class MangaSeeDownloader extends Downloader {
                 downloadMessageHelper.updateCompleted(message, 1);
 
                 callback.accept(manga);
+            } catch (InterruptedException e) {
+                logger.log(Level.INFO, "Cancelling download task", "");
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "Error encountered", "", e);
                 downloadMessageHelper.createErrorMessage(e.getLocalizedMessage());
             } finally {
+                taskManager.removeTask(message);
                 if (driver != null) {
                     driver.quit();
                 }
             }
+            return null;
         });
+        taskManager.addTask(message, task);
     }
 
     private String extractChapterNumber(String url) {
@@ -92,14 +99,14 @@ class MangaSeeDownloader extends Downloader {
         CustomLogger logger = new CustomLogger(log, String.format("downloadChapter - manga [%d] name [%s] source [%s] source ID [%s] chapter [%s] ",
                 manga.getId(), manga.getName(), manga.getSource(), manga.getSourceId(), chapterNumber));
         logger.log(Level.INFO, "Queuing download task", "");
-        DownloadMessage downloadChapterMessage = downloadMessageHelper.createDownloadChapterMessage(manga, chapterNumber);
+        DownloadMessage message = downloadMessageHelper.createDownloadChapterMessage(manga, chapterNumber);
 
-        executor.submit(() -> {
+        Future<Void> task = executor.submit(() -> {
             WebDriver driver = null;
             try {
                 logger.log(Level.INFO, "Starting download task", "");
 
-                driver = new ChromeDriver(chromeOptions);
+                driver = new ChromeDriver(chromeDriverService, chromeOptions);
                 Chapter chapter = manga.getChapters().get(chapterNumber);
                 chapter.getPages().clear();
                 int pageNumber = 1;
@@ -111,61 +118,71 @@ class MangaSeeDownloader extends Downloader {
 
                     Page page = new Page(pageNumber);
 
-                    new WebDriverWait(driver, WEB_DRIVER_TIMEOUT)
-                            .ignoring(StaleElementReferenceException.class)
-                            .until((WebDriver d) -> {
-                                logger.log(Level.INFO, "Waiting for elements to load", String.format("page [%d] pages [%d] URL [%s] ", page.getNumber(), chapter.getLastPage(), url));
+                    if (Thread.currentThread().isInterrupted()) {
+                        throw new InterruptedException();
+                    }
 
-                                if (page.getNumber() == 1) {
-                                    d.findElement(By.cssSelector("button[data-target='#PageModal']")).click();
-                                    List<WebElement> elements = d.findElements(By.cssSelector("button[ng-click='vm.GoToPage(Page)'"));
-                                    chapter.setLastPage(elements.size());
-                                    downloadChapterMessage.setTotal(elements.size());
-                                }
+                    try {
+                        new WebDriverWait(driver, WEB_DRIVER_TIMEOUT)
+                                .ignoring(StaleElementReferenceException.class)
+                                .until((WebDriver d) -> {
+                                    logger.log(Level.INFO, "Waiting for elements to load", String.format("page [%d] pages [%d] URL [%s] ", page.getNumber(), chapter.getLastPage(), url));
 
-                                String src = d.findElement(By.className("img-fluid")).getAttribute("src");
-                                if (src == null) {
-                                    return false;
-                                }
+                                    if (page.getNumber() == 1) {
+                                        d.findElement(By.cssSelector("button[data-target='#PageModal']")).click();
+                                        List<WebElement> elements = d.findElements(By.cssSelector("button[ng-click='vm.GoToPage(Page)'"));
+                                        chapter.setLastPage(elements.size());
+                                        message.setTotal(elements.size());
+                                    }
 
-                                logger.log(Level.INFO, "Elements loaded", String.format("page [%d] pages [%d] URL [%s] ", page.getNumber(), chapter.getLastPage(), url));
+                                    String src = d.findElement(By.className("img-fluid")).getAttribute("src");
+                                    if (src == null) {
+                                        return false;
+                                    }
 
-                                try {
-                                    BufferedImage image = ImageIO.read(new URL(src));
-                                    page.setImage(image);
-                                    chapter.getPages().put(page.getNumber(), page);
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                                return true;
-                            });
+                                    logger.log(Level.INFO, "Elements loaded", String.format("page [%d] pages [%d] URL [%s] ", page.getNumber(), chapter.getLastPage(), url));
+
+                                    try {
+                                        BufferedImage image = ImageIO.read(new URL(src));
+                                        page.setImage(image);
+                                        chapter.getPages().put(page.getNumber(), page);
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                    return true;
+                                });
+                    } catch (WebDriverException e) {
+                        throw (e.getCause() instanceof InterruptedException ? (InterruptedException) e.getCause() : e);
+                    }
 
                     logger.log(Level.INFO, "Finished downloading page", String.format("page [%d] pages [%d] URL [%s] ", pageNumber, chapter.getLastPage(), url));
-                    downloadMessageHelper.updateCompleted(downloadChapterMessage, pageNumber);
+                    downloadMessageHelper.updateCompleted(message, pageNumber);
 
                     if (pageNumber == chapter.getLastPage()) {
                         break;
                     }
                     pageNumber++;
-                    try {
-                        Thread.sleep(PAGE_DOWNLOAD_DELAY);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+
+                    Thread.sleep(PAGE_DOWNLOAD_DELAY);
                 }
 
                 chapter.setDownloaded(true);
                 logger.log(Level.INFO, "Finished download task", String.format("pages [%d] ", chapter.getLastPage()));
 
                 callback.accept(manga, chapter);
+            } catch (InterruptedException e) {
+                logger.log(Level.INFO, "Cancelling download task", "");
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "Error encountered", "", e);
                 downloadMessageHelper.createErrorMessage(e.getLocalizedMessage());
             } finally {
+                taskManager.removeTask(message);
                 if (driver != null) {
                     driver.quit();
                 }
             }
+            return null;
         });
+        taskManager.addTask(message, task);
     }
 }

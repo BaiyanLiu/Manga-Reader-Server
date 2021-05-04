@@ -1,6 +1,7 @@
 package com.baiyanliu.mangareader.controller;
 
 import com.baiyanliu.mangareader.downloader.DownloaderDispatcher;
+import com.baiyanliu.mangareader.downloader.TaskManager;
 import com.baiyanliu.mangareader.entity.Chapter;
 import com.baiyanliu.mangareader.entity.Manga;
 import com.baiyanliu.mangareader.entity.Page;
@@ -26,6 +27,7 @@ class MangaController {
     private final MangaRepository mangaRepository;
     private final ChapterRepository chapterRepository;
     private final DownloaderDispatcher downloaderDispatcher;
+    private final TaskManager taskManager;
 
     @RequestMapping("/api/chapters")
     public Map<String, Chapter> getAllChapters(@RequestParam("manga") Long mangaId) {
@@ -68,5 +70,11 @@ class MangaController {
             Hibernate.initialize(value.getChapters().get(chapterNumber).getPages());
             downloaderDispatcher.downloadChapter(value, chapterNumber);
         });
+    }
+
+    @RequestMapping("/api/cancelDownload")
+    public void cancelDownload(@RequestParam("id") Long messageId) {
+        log.log(Level.INFO, String.format("cancelDownload - id [%d]", messageId));
+        taskManager.cancelTask(messageId);
     }
 }

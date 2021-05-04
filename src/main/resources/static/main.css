@@ -44,6 +44,10 @@ input {
     float: left;
 }
 
+.float-right {
+    float: right;
+}
+
 hr {
     background-color: white;
     border-width: 0;

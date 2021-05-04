@@ -46,7 +46,7 @@ export default class ErrorLog extends React.Component {
 
     render() {
         const messages = this.state.messages.map(message => {
-            return <div>{new Date(message.timestamp).toLocaleString()}: {message.error}</div>
+            return <div className="log-line">{new Date(message.timestamp).toLocaleString()}: {message.error}</div>;
         });
         return (
             <div>

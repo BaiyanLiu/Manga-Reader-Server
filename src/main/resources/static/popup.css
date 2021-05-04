@@ -46,6 +46,10 @@ div.log {
     white-space: pre-line;
 }
 
+div.log-line {
+    margin: 5px 0;
+}
+
 div.popup h2 {
     margin-top: 0;
 }

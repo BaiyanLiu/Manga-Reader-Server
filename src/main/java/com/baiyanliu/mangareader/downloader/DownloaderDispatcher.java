@@ -20,11 +20,11 @@ public class DownloaderDispatcher {
     private final ChapterRepository chapterRepository;
 
     @Autowired
-    public DownloaderDispatcher(MangaRepository mangaRepository, ChapterRepository chapterRepository, DownloadMessageHelper downloadMessageHelper) {
+    public DownloaderDispatcher(MangaRepository mangaRepository, ChapterRepository chapterRepository, DownloadMessageHelper downloadMessageHelper, TaskManager taskManager) {
         this.mangaRepository = mangaRepository;
         this.chapterRepository = chapterRepository;
         downloaders = ImmutableMap.of(
-                Source.MANGA_SEE, new MangaSeeDownloader(downloadMessageHelper)
+                Source.MANGA_SEE, new MangaSeeDownloader(downloadMessageHelper, taskManager)
         );
     }
 
