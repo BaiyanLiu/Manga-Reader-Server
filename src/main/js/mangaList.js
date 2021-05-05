@@ -45,16 +45,16 @@ export default class MangaList extends React.Component {
 
         const navigation = [];
         if ("first" in this.props.links) {
-            navigation.push(<a key="first" onClick={this.handleFirst} className="button inline-margin">&lt;&lt;</a>);
+            navigation.push(<a key="first" onClick={this.handleFirst} className="button-inline">&lt;&lt;</a>);
         }
         if ("prev" in this.props.links) {
-            navigation.push(<a key="prev" onClick={this.handlePrev} className="button inline-margin">&lt;</a>);
+            navigation.push(<a key="prev" onClick={this.handlePrev} className="button-inline">&lt;</a>);
         }
         if ("next" in this.props.links) {
-            navigation.push(<a key="next" onClick={this.handleNext} className="button inline-margin">&gt;</a>);
+            navigation.push(<a key="next" onClick={this.handleNext} className="button-inline">&gt;</a>);
         }
         if ("last" in this.props.links) {
-            navigation.push(<a key="last" onClick={this.handleLast} className="button inline-margin">&gt;&gt;</a>);
+            navigation.push(<a key="last" onClick={this.handleLast} className="button-inline">&gt;&gt;</a>);
         }
 
         return (
@@ -95,7 +95,7 @@ class Manga extends React.Component {
         return (
             <tr>
                 <td>
-                    <div className="inline inline-margin">
+                    <div className="inline-margin">
                         {this.props.manga.name}
                     </div>
                     <ChapterList manga={this.props.manga}/>
@@ -108,7 +108,7 @@ class Manga extends React.Component {
                         onUpdate={this.props.onUpdate}/>
                 </td>
                 <td>
-                    <a onClick={this.handleDelete} className="button negative">Delete</a>
+                    <a onClick={this.handleDelete} className="button-negative">Delete</a>
                 </td>
             </tr>
         );
@@ -148,7 +148,7 @@ class UpdateDialog extends React.Component {
                         <a href="#" title="Close" className="close">X</a>
                         <form>
                             {inputs}
-                            <a onClick={this.handleSubmit} className="button positive">Update</a>
+                            <a onClick={this.handleSubmit} className="button">Update</a>
                         </form>
                     </div>
                 </div>

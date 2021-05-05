@@ -1,0 +1,64 @@
+.overlay {
+    background: rgba(0, 0, 0, 0.8);
+    inset: 0;
+    opacity: 0;
+    position: fixed;
+    visibility: hidden;
+    &:target {
+        opacity: 1;
+        visibility: visible;
+    }
+}
+
+.popup {
+    border: 1px solid white;
+    border-radius: 5px;
+    margin: 50px auto;
+    padding: 16px;
+    position: relative;
+    width: 10%;
+    & h2 {
+        margin-top: 0;
+    }
+    & .close {
+        color: white;
+        text-decoration: none;
+        font-size: 25px;
+        font-weight: bold;
+        position: absolute;
+        right: 21px;
+        top: 15px;
+        &:hover {
+            color: red;
+        }
+    }
+}
+
+.popup-big {
+    .popup();
+    width: 50%;
+    height: 90%;
+}
+
+.page {
+    .popup();
+    width: 95%;
+    height: 90%;
+    position: relative;
+    & .image {
+        height: calc(100% - 50px);
+        overflow: auto;
+        & img {
+            width: 100%;
+        }
+    }
+}
+
+.log {
+    height: calc(100% - 50px);
+    overflow: auto;
+    white-space: pre-line;
+    & .line {
+        margin: 5px 0;
+    }
+}

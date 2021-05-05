@@ -1,0 +1,62 @@
+body {
+    background-color: black;
+    color: white;
+    font-family: Arial, sans-serif;
+}
+
+.inline {
+    display: inline;
+}
+
+.inline-margin {
+    .inline();
+    margin-right: 5px;
+}
+
+.button {
+    background-color: black;
+    border: 1px solid white;
+    color: white;
+    cursor: pointer;
+    font-size: 12px;
+    padding: 2px;
+    text-decoration: none;
+    &:hover {
+        background-color: rgb(63, 72, 204);
+    }
+}
+
+.button-negative {
+    .button();
+    &:hover {
+        background-color: red;
+    }
+}
+
+.button-inline {
+    .button();
+    .inline-margin();
+}
+
+.button-left {
+    .button-inline();
+    float: left;
+}
+
+.button-cancel-download {
+    .button-negative();
+    .inline();
+    float: right;
+}
+
+input {
+    background-color: rgb(64, 64, 64);
+    border: 1px solid white;
+    color: white;
+}
+
+hr {
+    background-color: white;
+    border-width: 0;
+    height: 1px;
+}

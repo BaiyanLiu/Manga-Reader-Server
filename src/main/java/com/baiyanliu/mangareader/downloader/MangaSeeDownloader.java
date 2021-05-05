@@ -52,7 +52,7 @@ class MangaSeeDownloader extends Downloader {
     @Override
     protected int getLastPage(WebDriver driver) {
         driver.findElement(By.cssSelector("button[data-target='#PageModal']")).click();
-        List<WebElement> elements = driver.findElements(By.cssSelector("button[ng-click='vm.GoToPage(Page)'"));
+        List<WebElement> elements = driver.findElements(By.cssSelector("button[ng-click='vm.GoToPage(Page)']"));
         return elements.size();
     }
 

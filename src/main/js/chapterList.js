@@ -66,11 +66,11 @@ class Chapter extends React.Component {
     render() {
         return (
             <div className="chapter">
-                <div className={"inline inline-margin" + (this.props.chapter.read ? " read" : this.props.chapter.downloaded ? "" : " new")}>
+                <div className={"inline-margin" + (this.props.chapter.read ? " read" : this.props.chapter.downloaded ? "" : " new")}>
                     {this.props.chapter.name}
                 </div>
                 <div className="controls">
-                    <a onClick={this.handleDownload} className="button inline inline-margin">DL</a>
+                    <a onClick={this.handleDownload} className="button-inline">DL</a>
                     <Page
                         key={`page-${this.props.manga.id}-${this.props.chapter.number}`}
                         manga={this.props.manga}

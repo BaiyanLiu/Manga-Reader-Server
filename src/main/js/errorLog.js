@@ -46,7 +46,7 @@ export default class ErrorLog extends React.Component {
 
     render() {
         const messages = this.state.messages.map(message => {
-            return <div className="log-line">{new Date(message.timestamp).toLocaleString()}: {message.error}</div>;
+            return <div className="line">{new Date(message.timestamp).toLocaleString()}: {message.error}</div>;
         });
         return (
             <div>
@@ -54,9 +54,9 @@ export default class ErrorLog extends React.Component {
                     url={'http://localhost:8080/events'}
                     topics={['/topic/error']}
                     onMessage={msg => this.onMessage(msg)}/>
-                <a href="#errorLog" onClick={this.handleShow} className="button inline">Errors</a>
+                <a href="#errorLog" onClick={this.handleShow} className="button-inline">Errors</a>
                 <div id="errorLog" className="overlay">
-                    <div className="popup big">
+                    <div className="popup-big">
                         <h2>Errors</h2>
                         <a href="#" className="close">X</a>
                         <div ref={this.logDiv} className="log">

@@ -72,13 +72,13 @@ export default class DownloadLog extends React.Component {
 
     addControls(message) {
         if (message.completed !== message.total) {
-            return <a className="button inline float-right negative" onClick={() => fetch(`api/cancelDownload?id=${message.id}`).then(() => {})}>Cancel</a>;
+            return <a className="button-cancel-download" onClick={() => fetch(`api/cancelDownload?id=${message.id}`).then(() => {})}>Cancel</a>;
         }
     }
 
     render() {
         const messages = this.state.messageIds.map(id => {
-            return <div className="log-line">{this.formatMessage(this.state.messages[id])}{this.addControls(this.state.messages[id])}</div>;
+            return <div className="line">{this.formatMessage(this.state.messages[id])}{this.addControls(this.state.messages[id])}</div>;
         });
         return (
             <div>
@@ -86,9 +86,9 @@ export default class DownloadLog extends React.Component {
                     url={'http://localhost:8080/events'}
                     topics={['/topic/download']}
                     onMessage={msg => this.onMessage(msg)}/>
-                <a href="#downloadLog" onClick={this.handleShow} className="button inline inline-margin float-left">Downloads</a>
+                <a href="#downloadLog" onClick={this.handleShow} className="button-left">Downloads</a>
                 <div id="downloadLog" className="overlay">
-                    <div className="popup big">
+                    <div className="popup-big">
                         <h2>Downloads</h2>
                         <a href="#" className="close">X</a>
                         <div ref={this.logDiv} className="log">

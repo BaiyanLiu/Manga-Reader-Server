@@ -1,0 +1,27 @@
+table {
+    border-collapse: collapse;
+}
+
+td, th {
+    border: 1px solid white;
+    padding: 5px;
+    vertical-align: top;
+}
+
+.collapsible {
+    display: none;
+}
+
+.chapter {
+    margin: 5px 0;
+    & .new {
+        color: rgb(255, 242, 0);
+    }
+    & .read {
+        color: rgb(128, 128, 128);
+    }
+    & .controls {
+        display: inline;
+        float: right;
+    }
+}

@@ -40,7 +40,7 @@ public class DownloaderDispatcher {
         downloaders.get(manga.getSource()).downloadChapter(manga, chapterNumber, this::onChapterDownloaded);
     }
 
-    private void onChapterDownloaded(Manga manga, Chapter chapter) {
+    private void onChapterDownloaded(Chapter chapter) {
         chapterRepository.save(chapter);
     }
 }

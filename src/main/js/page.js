@@ -61,7 +61,7 @@ export default class Page extends React.Component {
             <div key={id} className="inline">
                 <a href={"#" + id} onClick={this.handleShow} className="button">...</a>
                 <div id={id} className="overlay">
-                    <div className="popup page">
+                    <div className="page">
                         <h2>Page {this.state.page.number}</h2>
                         <a href="#" onClick={this.handleHide} title="Close" className="close">X</a>
                         <div ref={this.pageDiv} className="image">
