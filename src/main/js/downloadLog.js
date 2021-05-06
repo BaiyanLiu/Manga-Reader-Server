@@ -26,12 +26,9 @@ export default class DownloadLog extends React.Component {
                 .then(data => {
                     this.hasLoaded = true;
                     const messages = {};
-                    this.addMessages(messages, data._embedded.downloadMetadataMessages);
-                    this.addMessages(messages, data._embedded.downloadChapterMessages);
                     const messageIds = [];
-                    Object.keys(messages).map(i => {
-                        messageIds.push(messages[i].id);
-                    });
+                    this.addMessages(messages, messageIds, data._embedded.downloadMetadataMessages);
+                    this.addMessages(messages, messageIds, data._embedded.downloadChapterMessages);
                     messageIds.sort((a, b) => parseInt(a) - parseInt(b));
                     this.setState({messages: messages, messageIds: messageIds});
                 });
@@ -39,10 +36,11 @@ export default class DownloadLog extends React.Component {
         window.location = e.currentTarget.href;
     }
 
-    addMessages(messages, data) {
+    addMessages(messages, messageIds, data) {
         if (data) {
             Object.keys(data).map(i => {
                 messages[data[i].id] = data[i];
+                messageIds.push(data[i].id);
             });
         }
     }
@@ -60,6 +58,10 @@ export default class DownloadLog extends React.Component {
         this.setState({messages: messages, messageIds: messageIds});
     }
 
+    onCancelDownload(messageId) {
+        fetch(`api/cancelDownload?id=${messageId}`).then(() => {});
+    }
+
     formatMessage(message) {
         const header = `${new Date(message.timestamp).toLocaleString()}: ${message.mangaName}`;
         const footer = ` | ${message.completed} of ${message.total}`;
@@ -72,7 +74,7 @@ export default class DownloadLog extends React.Component {
 
     addControls(message) {
         if (message.completed !== message.total) {
-            return <a className="button-cancel-download" onClick={() => fetch(`api/cancelDownload?id=${message.id}`).then(() => {})}>Cancel</a>;
+            return <a className="button-cancel-download" onClick={() => this.onCancelDownload(message.id)}>Cancel</a>;
         }
     }
 
@@ -85,7 +87,7 @@ export default class DownloadLog extends React.Component {
                 <SockJsClient
                     url={'http://localhost:8080/events'}
                     topics={['/topic/download']}
-                    onMessage={msg => this.onMessage(msg)}/>
+                    onMessage={message => this.onMessage(message)}/>
                 <a href="#downloadLog" onClick={this.handleShow} className="button-left">Downloads</a>
                 <div id="downloadLog" className="overlay">
                     <div className="popup-big">

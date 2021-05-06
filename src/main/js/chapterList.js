@@ -2,14 +2,16 @@
 
 import React from 'react';
 import Page from './page';
+import SockJsClient from "react-stomp";
 
 export default class ChapterList extends React.Component {
 
     constructor(props) {
         super(props);
         this.hasLoaded = false;
-        this.state = {chapters: []};
+        this.state = {chapters: {}, chapterNumbers: []};
         this.handleToggle = this.handleToggle.bind(this);
+        this.onUpdate = this.onUpdate.bind(this);
     }
 
     handleToggle(e) {
@@ -19,9 +21,14 @@ export default class ChapterList extends React.Component {
                 .then(response => response.json())
                 .then(data => {
                     this.hasLoaded = true;
-                    const chapters = Object.keys(data).map(i => data[i]);
-                    chapters.sort((a, b) => parseFloat(b.number) - parseFloat(a.number));
-                    this.setState({chapters: chapters});
+                    const chapters = {};
+                    const chapterNumbers = [];
+                    Object.keys(data).map(i => {
+                        chapters[data[i].number] = data[i];
+                        chapterNumbers.push(data[i].number);
+                    });
+                    chapterNumbers.sort((a, b) => parseFloat(b) - parseFloat(a));
+                    this.setState({chapters: chapters, chapterNumbers: chapterNumbers});
                 });
         }
         const collapsible = e.currentTarget.nextElementSibling.style;
@@ -32,15 +39,33 @@ export default class ChapterList extends React.Component {
         }
     }
 
+    onUpdate(chapter) {
+        if (!this.hasLoaded) {
+            return;
+        }
+        const chapters = this.state.chapters;
+        const chapterNumbers = this.state.chapterNumbers;
+        if (!(chapter.number in chapters)) {
+            chapterNumbers.push(chapter.number);
+            chapterNumbers.sort((a, b) => parseFloat(b) - parseFloat(a));
+        }
+        chapters[chapter.number] = chapter;
+        this.setState({chapters: chapters, chapterNumbers: chapterNumbers});
+    }
+
     render() {
-        const chapters = this.state.chapters.map(chapter =>
+        const chapters = this.state.chapterNumbers.map(number =>
             <Chapter
-                key={`chapter-${this.props.manga.id}-${chapter.number}`}
+                key={`chapter-${this.props.manga.id}-${number}`}
                 manga={this.props.manga}
-                chapter={chapter}/>
+                chapter={this.state.chapters[number]}/>
         );
         return (
             <div className="inline">
+                <SockJsClient
+                    url={'http://localhost:8080/events'}
+                    topics={['/topic/chapter']}
+                    onMessage={chapter => this.onUpdate(chapter)}/>
                 <a onClick={this.handleToggle} className="button">...</a>
                 <div className="collapsible">
                     <hr/>

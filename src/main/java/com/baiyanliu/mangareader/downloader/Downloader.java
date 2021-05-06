@@ -7,6 +7,7 @@ import com.baiyanliu.mangareader.entity.Chapter;
 import com.baiyanliu.mangareader.entity.Manga;
 import com.baiyanliu.mangareader.entity.Page;
 import lombok.extern.java.Log;
+import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
@@ -64,7 +65,7 @@ abstract class Downloader {
                 if (isLoadChaptersRequired()) {
                     try {
                         new WebDriverWait(driver, WEB_DRIVER_TIMEOUT)
-                                .ignoring(StaleElementReferenceException.class)
+                                .ignoring(ElementNotInteractableException.class, StaleElementReferenceException.class)
                                 .until((WebDriver d) -> {
                                     logger.log(Level.INFO, "Waiting for elements to load", String.format("URL [%s] ", url));
                                     loadChapters(d);
@@ -143,7 +144,7 @@ abstract class Downloader {
 
                     try {
                         new WebDriverWait(driver, WEB_DRIVER_TIMEOUT)
-                                .ignoring(StaleElementReferenceException.class)
+                                .ignoring(ElementNotInteractableException.class, StaleElementReferenceException.class)
                                 .until((WebDriver d) -> {
                                     logger.log(Level.INFO, "Waiting for elements to load", String.format("page [%d] pages [%d] URL [%s] ", page.getNumber(), chapter.getLastPage(), url));
 
