@@ -4,10 +4,12 @@ import com.baiyanliu.mangareader.entity.Chapter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.Collection;
+
 @AllArgsConstructor
 public class ChapterUpdateMessage extends Message {
     @Getter private final Long mangaId;
-    @Getter private final Chapter chapter;
+    @Getter private final Collection<Chapter> chapters;
 
     @Override
     protected String getDestination() {

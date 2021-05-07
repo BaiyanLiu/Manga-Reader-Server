@@ -45,11 +45,13 @@ export default class ChapterList extends React.Component {
         }
         const chapters = this.state.chapters;
         const chapterNumbers = this.state.chapterNumbers;
-        if (!(message.chapter.number in chapters)) {
-            chapterNumbers.push(message.chapter.number);
-            chapterNumbers.sort((a, b) => parseFloat(b) - parseFloat(a));
-        }
-        chapters[message.chapter.number] = message.chapter;
+        message.chapters.map(chapter => {
+            if (!(chapter.number in chapters)) {
+                chapterNumbers.push(chapter.number);
+            }
+            chapters[chapter.number] = chapter;
+        });
+        chapterNumbers.sort((a, b) => parseFloat(b) - parseFloat(a));
         this.setState({chapters: chapters, chapterNumbers: chapterNumbers});
     }
 

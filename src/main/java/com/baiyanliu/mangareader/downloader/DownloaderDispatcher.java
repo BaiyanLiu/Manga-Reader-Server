@@ -1,6 +1,5 @@
 package com.baiyanliu.mangareader.downloader;
 
-import com.baiyanliu.mangareader.configuration.WebSocketConfiguration;
 import com.baiyanliu.mangareader.downloader.messaging.DownloadMessageHelper;
 import com.baiyanliu.mangareader.entity.Chapter;
 import com.baiyanliu.mangareader.entity.Manga;
@@ -13,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.Map;
 
 @Component
@@ -39,7 +39,7 @@ public class DownloaderDispatcher {
 
     private void onMetadataDownloaded(Manga manga) {
         mangaRepository.save(manga);
-        webSocket.convertAndSend(WebSocketConfiguration.MESSAGE_PREFIX + "/manga", manga);
+        new ChapterUpdateMessage(manga.getId(), manga.getChapters().values()).send(webSocket);
     }
 
     public void downloadChapter(Manga manga, String chapterNumber) {
@@ -48,6 +48,6 @@ public class DownloaderDispatcher {
 
     private void onChapterDownloaded(Manga manga, Chapter chapter) {
         chapterRepository.save(chapter);
-        new ChapterUpdateMessage(manga.getId(), chapter).send(webSocket);
+        new ChapterUpdateMessage(manga.getId(), Collections.singletonList(chapter)).send(webSocket);
     }
 }

@@ -55,7 +55,7 @@ class MangaController {
                 if (pageNumber == chapter.getLastPage()) {
                     chapter.setRead(true);
                     chapterRepository.save(chapter);
-                    new ChapterUpdateMessage(mangaId, chapter).send(webSocket);
+                    new ChapterUpdateMessage(mangaId, Collections.singletonList(chapter)).send(webSocket);
                 }
                 return chapter.getPages().get(pageNumber);
             }
