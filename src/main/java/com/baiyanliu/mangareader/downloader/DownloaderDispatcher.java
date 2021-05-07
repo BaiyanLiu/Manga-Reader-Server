@@ -7,6 +7,7 @@ import com.baiyanliu.mangareader.entity.Manga;
 import com.baiyanliu.mangareader.entity.Source;
 import com.baiyanliu.mangareader.entity.repository.ChapterRepository;
 import com.baiyanliu.mangareader.entity.repository.MangaRepository;
+import com.baiyanliu.mangareader.messaging.ChapterUpdateMessage;
 import com.google.common.collect.ImmutableMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -45,8 +46,8 @@ public class DownloaderDispatcher {
         downloaders.get(manga.getSource()).downloadChapter(manga, chapterNumber, this::onChapterDownloaded);
     }
 
-    private void onChapterDownloaded(Chapter chapter) {
+    private void onChapterDownloaded(Manga manga, Chapter chapter) {
         chapterRepository.save(chapter);
-        webSocket.convertAndSend(WebSocketConfiguration.MESSAGE_PREFIX + "/chapter", chapter);
+        new ChapterUpdateMessage(manga.getId(), chapter).send(webSocket);
     }
 }

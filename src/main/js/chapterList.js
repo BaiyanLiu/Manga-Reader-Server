@@ -11,7 +11,7 @@ export default class ChapterList extends React.Component {
         this.hasLoaded = false;
         this.state = {chapters: {}, chapterNumbers: []};
         this.handleToggle = this.handleToggle.bind(this);
-        this.onUpdate = this.onUpdate.bind(this);
+        this.onMessage = this.onMessage.bind(this);
     }
 
     handleToggle(e) {
@@ -39,17 +39,17 @@ export default class ChapterList extends React.Component {
         }
     }
 
-    onUpdate(chapter) {
-        if (!this.hasLoaded) {
+    onMessage(message) {
+        if (!this.hasLoaded || message.mangaId !== this.props.manga.id) {
             return;
         }
         const chapters = this.state.chapters;
         const chapterNumbers = this.state.chapterNumbers;
-        if (!(chapter.number in chapters)) {
-            chapterNumbers.push(chapter.number);
+        if (!(message.chapter.number in chapters)) {
+            chapterNumbers.push(message.chapter.number);
             chapterNumbers.sort((a, b) => parseFloat(b) - parseFloat(a));
         }
-        chapters[chapter.number] = chapter;
+        chapters[message.chapter.number] = message.chapter;
         this.setState({chapters: chapters, chapterNumbers: chapterNumbers});
     }
 
@@ -65,7 +65,7 @@ export default class ChapterList extends React.Component {
                 <SockJsClient
                     url={'http://localhost:8080/events'}
                     topics={['/topic/chapter']}
-                    onMessage={chapter => this.onUpdate(chapter)}/>
+                    onMessage={message => this.onMessage(message)}/>
                 <a onClick={this.handleToggle} className="button">...</a>
                 <div className="collapsible">
                     <hr/>

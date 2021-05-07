@@ -15,7 +15,7 @@ import java.util.Date;
 @Entity
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ErrorMessage extends Message {
+public class ErrorMessage extends LogMessage {
     @GeneratedValue(generator = "errorMessageId") @Id private long id;
 
     private String error;

@@ -1,7 +1,7 @@
 package com.baiyanliu.mangareader.downloader.messaging;
 
 import com.baiyanliu.mangareader.entity.Manga;
-import com.baiyanliu.mangareader.messaging.Message;
+import com.baiyanliu.mangareader.messaging.LogMessage;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -18,7 +18,7 @@ import java.util.Date;
 @Inheritance
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @RestResource(path="downloadMessages")
-public abstract class DownloadMessage extends Message {
+public abstract class DownloadMessage extends LogMessage {
     @GeneratedValue(generator = "downloadMessageId") @Id private long id;
 
     @ManyToOne private Manga manga;

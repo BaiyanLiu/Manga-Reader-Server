@@ -1,6 +1,5 @@
 package com.baiyanliu.mangareader.controller;
 
-import com.baiyanliu.mangareader.configuration.WebSocketConfiguration;
 import com.baiyanliu.mangareader.downloader.DownloaderDispatcher;
 import com.baiyanliu.mangareader.downloader.TaskManager;
 import com.baiyanliu.mangareader.entity.Chapter;
@@ -8,6 +7,7 @@ import com.baiyanliu.mangareader.entity.Manga;
 import com.baiyanliu.mangareader.entity.Page;
 import com.baiyanliu.mangareader.entity.repository.ChapterRepository;
 import com.baiyanliu.mangareader.entity.repository.MangaRepository;
+import com.baiyanliu.mangareader.messaging.ChapterUpdateMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.hibernate.Hibernate;
@@ -55,7 +55,7 @@ class MangaController {
                 if (pageNumber == chapter.getLastPage()) {
                     chapter.setRead(true);
                     chapterRepository.save(chapter);
-                    webSocket.convertAndSend(WebSocketConfiguration.MESSAGE_PREFIX + "/chapter", chapter);
+                    new ChapterUpdateMessage(mangaId, chapter).send(webSocket);
                 }
                 return chapter.getPages().get(pageNumber);
             }
