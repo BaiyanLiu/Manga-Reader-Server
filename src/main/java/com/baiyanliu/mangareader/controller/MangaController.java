@@ -12,7 +12,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,6 +26,7 @@ import java.util.logging.Level;
 
 @Log
 @RestController
+@RequestMapping("/api")
 @RequiredArgsConstructor(onConstructor = @__({@Autowired}))
 class MangaController {
     private final MangaRepository mangaRepository;
@@ -32,38 +35,40 @@ class MangaController {
     private final DownloaderDispatcher downloaderDispatcher;
     private final TaskManager taskManager;
 
-    @RequestMapping("/api/chapters")
-    public Map<String, Chapter> getAllChapters(@RequestParam("manga") Long mangaId) {
+    @GetMapping("/chapters")
+    public ResponseEntity<Map<String, Chapter>> getAllChapters(@RequestParam("manga") Long mangaId) {
         log.log(Level.INFO, String.format("getAllChapters - manga [%d]", mangaId));
         Optional<Manga> manga = mangaRepository.findById(mangaId);
-        if (manga.isPresent()) {
-            return manga.get().getChapters();
-        }
-        return Collections.emptyMap();
+        return manga
+                .map(value -> ResponseEntity.ok(value.getChapters()))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @RequestMapping("/api/page")
-    public Page getOnePage(
+    @GetMapping("/page")
+    public ResponseEntity<Page> getOnePage(
             @RequestParam("manga") Long mangaId,
             @RequestParam("chapter") String chapterNumber,
             @RequestParam("page") int pageNumber) {
         log.log(Level.INFO, String.format("getOnePage - manga [%d] chapter [%s] page [%d]", mangaId, chapterNumber, pageNumber));
-        Map<String, Chapter> chapters = getAllChapters(mangaId);
-        if (chapters.containsKey(chapterNumber)) {
-            Chapter chapter = chapters.get(chapterNumber);
-            if (chapter.getPages().containsKey(pageNumber)) {
-                if (pageNumber == chapter.getLastPage()) {
-                    chapter.setRead(true);
-                    chapterRepository.save(chapter);
-                    new ChapterUpdateMessage(mangaId, Collections.singletonList(chapter)).send(webSocket);
+        Optional<Manga> manga = mangaRepository.findById(mangaId);
+        if (manga.isPresent()) {
+            Map<String, Chapter> chapters = manga.get().getChapters();
+            if (chapters.containsKey(chapterNumber)) {
+                Chapter chapter = chapters.get(chapterNumber);
+                if (chapter.getPages().containsKey(pageNumber)) {
+                    if (pageNumber == chapter.getLastPage()) {
+                        chapter.setRead(true);
+                        chapterRepository.save(chapter);
+                        new ChapterUpdateMessage(mangaId, Collections.singletonList(chapter)).send(webSocket);
+                    }
+                    return ResponseEntity.ok(chapter.getPages().get(pageNumber));
                 }
-                return chapter.getPages().get(pageNumber);
             }
         }
-        return null;
+        return ResponseEntity.notFound().build();
     }
 
-    @RequestMapping("/api/downloadChapter")
+    @RequestMapping("/downloadChapter")
     public void downloadChapter(
             @RequestParam("manga") Long mangaId,
             @RequestParam("chapter") String chapterNumber) {
@@ -76,7 +81,7 @@ class MangaController {
         });
     }
 
-    @RequestMapping("/api/cancelDownload")
+    @RequestMapping("/cancelDownload")
     public void cancelDownload(@RequestParam("id") Long messageId) {
         log.log(Level.INFO, String.format("cancelDownload - id [%d]", messageId));
         taskManager.cancelTask(messageId);

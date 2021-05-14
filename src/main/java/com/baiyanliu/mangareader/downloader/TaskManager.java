@@ -1,13 +1,13 @@
 package com.baiyanliu.mangareader.downloader;
 
 import com.baiyanliu.mangareader.downloader.messaging.DownloadMessage;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Future;
 
-@Component
+@Service
 public class TaskManager {
     private final Map<Long, Future<Void>> tasks = new HashMap<>();
 

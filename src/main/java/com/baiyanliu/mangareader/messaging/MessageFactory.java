@@ -3,10 +3,10 @@ package com.baiyanliu.mangareader.messaging;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
 @RequiredArgsConstructor(onConstructor = @__({@Autowired}))
+@Service
 public class MessageFactory {
     protected final SimpMessagingTemplate webSocket;
 

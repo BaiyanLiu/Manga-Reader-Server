@@ -10,12 +10,12 @@ import com.baiyanliu.mangareader.messaging.ChapterUpdateMessage;
 import com.google.common.collect.ImmutableMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.Map;
 
-@Component
+@Service
 public class DownloaderDispatcher {
     private final Map<Source, Downloader> downloaders;
 
