@@ -17,7 +17,7 @@ export default class ChapterList extends React.Component {
     handleToggle(e) {
         e.preventDefault();
         if (!this.hasLoaded) {
-            fetch(`api/chapters?manga=${this.props.manga.id}`)
+            fetch(this.props.manga._links.chapters.href)
                 .then(response => response.json())
                 .then(data => {
                     this.hasLoaded = true;

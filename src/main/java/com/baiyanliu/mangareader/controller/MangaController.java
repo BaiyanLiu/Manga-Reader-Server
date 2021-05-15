@@ -12,17 +12,21 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.server.RepresentationModelProcessor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Level;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Log
 @RestController
@@ -35,8 +39,23 @@ class MangaController {
     private final DownloaderDispatcher downloaderDispatcher;
     private final TaskManager taskManager;
 
-    @GetMapping("/chapters")
-    public ResponseEntity<Map<String, Chapter>> getAllChapters(@RequestParam("manga") Long mangaId) {
+    @Bean
+    public RepresentationModelProcessor<EntityModel<Manga>> mangaProcessor() {
+        return new RepresentationModelProcessor<>() {
+            @NonNull
+            @Override
+            public EntityModel<Manga> process(@NonNull EntityModel<Manga> model) {
+                Manga manga = model.getContent();
+                if (manga != null) {
+                    model.add(linkTo(methodOn(MangaController.class).getAllChapters(manga.getId())).withRel("chapters"));
+                }
+                return model;
+            }
+        };
+    }
+
+    @GetMapping("/chapters/{manga}")
+    public ResponseEntity<Map<String, Chapter>> getAllChapters(@PathVariable("manga") Long mangaId) {
         log.log(Level.INFO, String.format("getAllChapters - manga [%d]", mangaId));
         Optional<Manga> manga = mangaRepository.findById(mangaId);
         return manga
