@@ -58,8 +58,8 @@ export default class DownloadLog extends React.Component {
         this.setState({messages: messages, messageIds: messageIds});
     }
 
-    onCancelDownload(messageId) {
-        fetch(`api/cancelDownload?id=${messageId}`).then(() => {});
+    onCancelDownload(message) {
+        fetch(message._links.cancel.href).then(() => {});
     }
 
     formatMessage(message) {
@@ -74,7 +74,7 @@ export default class DownloadLog extends React.Component {
 
     addControls(message) {
         if (message.completed !== message.total) {
-            return <a className="button-cancel-download" onClick={() => this.onCancelDownload(message.id)}>Cancel</a>;
+            return <a className="button-cancel-download" onClick={() => this.onCancelDownload(message)}>Cancel</a>;
         }
     }
 
@@ -88,7 +88,7 @@ export default class DownloadLog extends React.Component {
                     url={'http://localhost:8080/events'}
                     topics={['/topic/download']}
                     onMessage={message => this.onMessage(message)}/>
-                <a href="#downloadLog" onClick={this.handleShow} className="button-left">Downloads</a>
+                <a href={"#downloadLog"} onClick={this.handleShow} className="button-left">Downloads</a>
                 <div id="downloadLog" className="overlay">
                     <div className="popup-big">
                         <h2>Downloads</h2>

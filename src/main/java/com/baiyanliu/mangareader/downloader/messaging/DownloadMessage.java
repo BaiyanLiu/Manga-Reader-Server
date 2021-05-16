@@ -1,5 +1,6 @@
 package com.baiyanliu.mangareader.downloader.messaging;
 
+import com.baiyanliu.mangareader.controller.DownloadMessageProcessor;
 import com.baiyanliu.mangareader.entity.Manga;
 import com.baiyanliu.mangareader.messaging.LogMessage;
 import com.fasterxml.jackson.annotation.JsonGetter;
@@ -8,6 +9,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.data.rest.core.annotation.RestResource;
+import org.springframework.hateoas.EntityModel;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -40,5 +42,10 @@ public abstract class DownloadMessage extends LogMessage {
     @Override
     protected String getDestination() {
         return "/download";
+    }
+
+    @Override
+    protected Object prepareForSend() {
+        return EntityModel.of(this, DownloadMessageProcessor.generateLinks(this));
     }
 }

@@ -12,11 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.server.RepresentationModelProcessor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.NonNull;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,9 +20,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Level;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Log
 @RestController
@@ -38,21 +31,6 @@ class MangaController {
     private final SimpMessagingTemplate webSocket;
     private final DownloaderDispatcher downloaderDispatcher;
     private final TaskManager taskManager;
-
-    @Bean
-    public RepresentationModelProcessor<EntityModel<Manga>> mangaProcessor() {
-        return new RepresentationModelProcessor<>() {
-            @NonNull
-            @Override
-            public EntityModel<Manga> process(@NonNull EntityModel<Manga> model) {
-                Manga manga = model.getContent();
-                if (manga != null) {
-                    model.add(linkTo(methodOn(MangaController.class).getAllChapters(manga.getId())).withRel("chapters"));
-                }
-                return model;
-            }
-        };
-    }
 
     @GetMapping("/chapters/{manga}")
     public ResponseEntity<Map<String, Chapter>> getAllChapters(@PathVariable("manga") Long mangaId) {
@@ -100,9 +78,10 @@ class MangaController {
         });
     }
 
-    @RequestMapping("/cancelDownload")
-    public void cancelDownload(@RequestParam("id") Long messageId) {
+    @RequestMapping("/cancelDownload/{id}")
+    public ResponseEntity<Void> cancelDownload(@PathVariable("id") Long messageId) {
         log.log(Level.INFO, String.format("cancelDownload - id [%d]", messageId));
         taskManager.cancelTask(messageId);
+        return ResponseEntity.ok().build();
     }
 }

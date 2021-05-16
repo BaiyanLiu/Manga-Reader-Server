@@ -136,7 +136,7 @@ class CreateDialog extends React.Component {
         );
         return (
             <div>
-                <a href="#createManga" className="button">Create</a>
+                <a href={"#createManga"} className="button">Create</a>
                 <div id="createManga" className="overlay">
                     <div className="popup">
                         <h2>Create manga</h2>
