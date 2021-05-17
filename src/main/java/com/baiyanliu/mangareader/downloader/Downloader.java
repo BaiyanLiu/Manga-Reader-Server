@@ -19,6 +19,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.net.URL;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -74,14 +75,14 @@ abstract class Downloader {
                                     return true;
                                 });
                     } catch (WebDriverException e) {
-                        throw (e.getCause() instanceof InterruptedException ? (InterruptedException) e.getCause() : e);
+                        throw (e.getCause() instanceof InterruptedException || e.getCause() instanceof InterruptedIOException ? (Exception) e.getCause() : e);
                     }
                 }
 
                 for (String chapterNumber : getChapterNumbers(driver)) {
                     logger.log(Level.INFO, "Found chapter", String.format("URL [%s] chapter [%s] ", url, chapterNumber));
                     if (!manga.getChapters().containsKey(chapterNumber)) {
-                        Chapter chapter = new Chapter(chapterNumber, "Chapter " + chapterNumber);
+                        Chapter chapter = new Chapter(manga, chapterNumber, "Chapter " + chapterNumber);
                         manga.getChapters().put(chapter.getNumber(), chapter);
                     }
                 }
@@ -90,7 +91,7 @@ abstract class Downloader {
                 downloadMessageHelper.updateCompleted(message, 1);
 
                 callback.accept(manga);
-            } catch (InterruptedException e) {
+            } catch (InterruptedException | InterruptedIOException e) {
                 logger.log(Level.INFO, "Cancelling download task", "");
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "Error encountered", "", e);
@@ -172,7 +173,7 @@ abstract class Downloader {
                                     return true;
                                 });
                     } catch (WebDriverException e) {
-                        throw (e.getCause() instanceof InterruptedException ? (InterruptedException) e.getCause() : e);
+                        throw (e.getCause() instanceof InterruptedException || e.getCause() instanceof InterruptedIOException ? (Exception) e.getCause() : e);
                     }
 
                     logger.log(Level.INFO, "Finished downloading page", String.format("page [%d] pages [%d] URL [%s] ", pageNumber, chapter.getLastPage(), url));
@@ -190,7 +191,7 @@ abstract class Downloader {
                 logger.log(Level.INFO, "Finished download task", String.format("pages [%d] ", chapter.getLastPage()));
 
                 callback.accept(manga, chapter);
-            } catch (InterruptedException e) {
+            } catch (InterruptedException | InterruptedIOException e) {
                 logger.log(Level.INFO, "Cancelling download task", "");
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "Error encountered", "", e);

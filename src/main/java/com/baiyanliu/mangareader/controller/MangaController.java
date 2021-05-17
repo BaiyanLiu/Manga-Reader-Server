@@ -12,13 +12,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.logging.Level;
 
 @Log
@@ -33,12 +33,17 @@ class MangaController {
     private final TaskManager taskManager;
 
     @GetMapping("/chapters/{manga}")
-    public ResponseEntity<Map<String, Chapter>> getAllChapters(@PathVariable("manga") Long mangaId) {
+    public ResponseEntity<CollectionModel<EntityModel<Chapter>>> getAllChapters(@PathVariable("manga") Long mangaId) {
         log.log(Level.INFO, String.format("getAllChapters - manga [%d]", mangaId));
         Optional<Manga> manga = mangaRepository.findById(mangaId);
-        return manga
-                .map(value -> ResponseEntity.ok(value.getChapters()))
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        if (manga.isPresent()) {
+            List<EntityModel<Chapter>> chapters = new ArrayList<>();
+            for (Chapter chapter : manga.get().getChapters().values()) {
+                chapters.add(EntityModel.of(chapter));
+            }
+            return ResponseEntity.ok(CollectionModel.of(chapters));
+        }
+        return ResponseEntity.notFound().build();
     }
 
     @GetMapping("/page")
@@ -66,7 +71,7 @@ class MangaController {
     }
 
     @RequestMapping("/downloadChapter")
-    public void downloadChapter(
+    public ResponseEntity<Void> downloadChapter(
             @RequestParam("manga") Long mangaId,
             @RequestParam("chapter") String chapterNumber) {
         log.log(Level.INFO, String.format("downloadChapter - manga [%d] chapter [%s]", mangaId, chapterNumber));
@@ -76,6 +81,7 @@ class MangaController {
             Hibernate.initialize(value.getChapters().get(chapterNumber).getPages());
             downloaderDispatcher.downloadChapter(value, chapterNumber);
         });
+        return ResponseEntity.ok().build();
     }
 
     @RequestMapping("/cancelDownload/{id}")

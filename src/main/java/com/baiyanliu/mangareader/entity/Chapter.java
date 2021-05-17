@@ -16,6 +16,7 @@ public class Chapter {
     @GeneratedValue(generator = "chapterId") @Id private long id;
     @JsonIgnore @Version private long version;
 
+    @ManyToOne private Manga manga;
     private String number;
     private String name;
     private int lastPage;
@@ -26,7 +27,8 @@ public class Chapter {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private Map<Integer, Page> pages = new HashMap<>();
 
-    public Chapter(String number, String name) {
+    public Chapter(Manga manga, String number, String name) {
+        this.manga = manga;
         this.number = number;
         this.name = name;
     }

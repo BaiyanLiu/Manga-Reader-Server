@@ -23,9 +23,9 @@ export default class ChapterList extends React.Component {
                     this.hasLoaded = true;
                     const chapters = {};
                     const chapterNumbers = [];
-                    Object.keys(data).map(i => {
-                        chapters[data[i].number] = data[i];
-                        chapterNumbers.push(data[i].number);
+                    data._embedded.chapters.map(chapter => {
+                        chapters[chapter.number] = chapter;
+                        chapterNumbers.push(chapter.number);
                     });
                     chapterNumbers.sort((a, b) => parseFloat(b) - parseFloat(a));
                     this.setState({chapters: chapters, chapterNumbers: chapterNumbers});
@@ -87,7 +87,7 @@ class Chapter extends React.Component {
 
     handleDownload(e) {
         e.preventDefault();
-        fetch(`api/downloadChapter?manga=${this.props.manga.id}&chapter=${this.props.chapter.number}`).then(() => {});
+        fetch(this.props.chapter._links.download.href).then(() => {});
     }
 
     render() {

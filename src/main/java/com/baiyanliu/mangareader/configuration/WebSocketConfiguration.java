@@ -3,7 +3,7 @@ package com.baiyanliu.mangareader.configuration;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.RepresentationModel;
 import org.springframework.hateoas.mediatype.MessageResolver;
 import org.springframework.hateoas.mediatype.hal.CurieProvider;
 import org.springframework.hateoas.mediatype.hal.Jackson2HalModule;
@@ -29,12 +29,12 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
 
         @Override
         protected boolean supports(@NonNull Class<?> clazz) {
-            return EntityModel.class.isAssignableFrom(clazz);
+            return RepresentationModel.class.isAssignableFrom(clazz);
         }
 
         @Override
         protected Object convertToInternal(@NonNull Object payload, MessageHeaders headers, Object conversionHint) {
-            TypeConstrainedMappingJackson2HttpMessageConverter converter = new TypeConstrainedMappingJackson2HttpMessageConverter(EntityModel.class);
+            TypeConstrainedMappingJackson2HttpMessageConverter converter = new TypeConstrainedMappingJackson2HttpMessageConverter(RepresentationModel.class);
 
             Jackson2HalModule.HalHandlerInstantiator instantiator =
                     new Jackson2HalModule.HalHandlerInstantiator(new DefaultLinkRelationProvider(), CurieProvider.NONE, MessageResolver.DEFAULTS_ONLY);
