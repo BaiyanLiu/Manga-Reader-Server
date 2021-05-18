@@ -19,15 +19,14 @@ export default class Page extends React.Component {
     }
 
     handleKeyDown(e) {
-        let page = this.state.page.number;
-        if (e.key === "ArrowLeft" && page > 1) {
-            page--;
-        } else if (e.key === "ArrowRight") {
-            page++;
-        }
-        if (page !== this.state.page.number) {
-            e.preventDefault()
-            this.navigate(page)
+        if (this.hasLoaded) {
+            if (e.key === "ArrowLeft" && this.state.page._links.prev) {
+                e.preventDefault()
+                this.navigate(this.state.page._links.prev.href)
+            } else if (e.key === "ArrowRight" && this.state.page._links.next) {
+                e.preventDefault()
+                this.navigate(this.state.page._links.next.href)
+            }
         }
     }
 
@@ -35,7 +34,7 @@ export default class Page extends React.Component {
         e.preventDefault();
         document.addEventListener("keydown", this.handleKeyDown)
         if (!this.hasLoaded) {
-            this.navigate(this.props.page);
+            this.navigate(this.props.chapter._links.firstPage.href);
         }
         window.location = e.currentTarget.href;
     }
@@ -46,8 +45,8 @@ export default class Page extends React.Component {
         window.location = e.currentTarget.href;
     }
 
-    navigate(page) {
-        fetch(`api/page?manga=${this.props.manga.id}&chapter=${this.props.chapter.number}&page=${page}`)
+    navigate(url) {
+        fetch(url)
             .then(response => response.json())
             .then(data => {
                 this.hasLoaded = true;

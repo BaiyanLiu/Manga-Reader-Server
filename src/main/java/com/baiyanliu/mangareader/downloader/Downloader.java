@@ -142,7 +142,7 @@ abstract class Downloader {
                     logger.log(Level.INFO, "Downloading page", String.format("page [%d] pages [%d] URL [%s] ", pageNumber, chapter.getLastPage(), url));
                     driver.get(url);
 
-                    Page page = new Page(pageNumber);
+                    Page page = new Page(chapter, pageNumber);
 
                     try {
                         new WebDriverWait(driver, WEB_DRIVER_TIMEOUT)

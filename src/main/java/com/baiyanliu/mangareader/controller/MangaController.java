@@ -47,7 +47,7 @@ class MangaController {
     }
 
     @GetMapping("/page")
-    public ResponseEntity<Page> getOnePage(
+    public ResponseEntity<EntityModel<Page>> getOnePage(
             @RequestParam("manga") Long mangaId,
             @RequestParam("chapter") String chapterNumber,
             @RequestParam("page") int pageNumber) {
@@ -63,7 +63,7 @@ class MangaController {
                         chapterRepository.save(chapter);
                         new ChapterUpdateMessage(mangaId, Collections.singletonList(chapter)).send(webSocket);
                     }
-                    return ResponseEntity.ok(chapter.getPages().get(pageNumber));
+                    return ResponseEntity.ok(EntityModel.of(chapter.getPages().get(pageNumber)));
                 }
             }
         }

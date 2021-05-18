@@ -16,11 +16,13 @@ public class Page {
     @GeneratedValue(generator = "pageId") @Id private long id;
     @JsonIgnore @Version private long version;
 
+    @ManyToOne private Chapter chapter;
     private int number;
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private PageImage image;
 
-    public Page(int number) {
+    public Page(Chapter chapter, int number) {
+        this.chapter = chapter;
         this.number = number;
     }
 

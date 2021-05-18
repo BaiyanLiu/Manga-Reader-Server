@@ -101,8 +101,7 @@ class Chapter extends React.Component {
                     <Page
                         key={`page-${this.props.manga.id}-${this.props.chapter.number}`}
                         manga={this.props.manga}
-                        chapter={this.props.chapter}
-                        page={1}/>
+                        chapter={this.props.chapter}/>
                 </div>
             </div>
         );
