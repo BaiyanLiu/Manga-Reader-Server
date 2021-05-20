@@ -26,11 +26,13 @@ public abstract class DownloadMessage extends LogMessage {
     @ManyToOne private Manga manga;
     private int total;
     private int completed;
+    private Status status;
 
     public DownloadMessage(Manga manga) {
         super(new Date());
         this.manga = manga;
         total = 1;
+        status = Status.STARTED;
     }
 
     @JsonGetter(value = "mangaName")

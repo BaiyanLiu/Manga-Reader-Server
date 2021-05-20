@@ -62,6 +62,15 @@ export default class DownloadLog extends React.Component {
         fetch(message._links.cancel.href).then(() => {});
     }
 
+    getStyle(message) {
+        if (message.status === "COMPLETED") {
+            return " completed";
+        } else if (message.status === "CANCELLED") {
+            return " cancelled";
+        }
+        return "";
+    }
+
     formatMessage(message) {
         const header = `${new Date(message.timestamp).toLocaleString()}: ${message.mangaName}`;
         const footer = ` | ${message.completed} of ${message.total}`;
@@ -73,14 +82,15 @@ export default class DownloadLog extends React.Component {
     }
 
     addControls(message) {
-        if (message.completed !== message.total) {
+        if (message.status === "STARTED") {
             return <a className="button-cancel-download" onClick={() => this.onCancelDownload(message)}>Cancel</a>;
         }
     }
 
     render() {
         const messages = this.state.messageIds.map(id => {
-            return <div className="line">{this.formatMessage(this.state.messages[id])}{this.addControls(this.state.messages[id])}</div>;
+            const message = this.state.messages[id];
+            return <div className={"line" + this.getStyle(message)}>{this.formatMessage(message)}{this.addControls(message)}</div>;
         });
         return (
             <div>

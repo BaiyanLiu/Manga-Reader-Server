@@ -3,6 +3,7 @@ package com.baiyanliu.mangareader.downloader;
 import com.baiyanliu.mangareader.CustomLogger;
 import com.baiyanliu.mangareader.downloader.messaging.DownloadMessage;
 import com.baiyanliu.mangareader.downloader.messaging.DownloadMessageHelper;
+import com.baiyanliu.mangareader.downloader.messaging.Status;
 import com.baiyanliu.mangareader.entity.Chapter;
 import com.baiyanliu.mangareader.entity.Manga;
 import com.baiyanliu.mangareader.entity.Page;
@@ -93,6 +94,7 @@ abstract class Downloader {
                 callback.accept(manga);
             } catch (InterruptedException | InterruptedIOException e) {
                 logger.log(Level.INFO, "Cancelling download task", "");
+                downloadMessageHelper.updateStatus(message, Status.CANCELLED);
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "Error encountered", "", e);
                 downloadMessageHelper.createErrorMessage(e.getLocalizedMessage());
@@ -193,6 +195,7 @@ abstract class Downloader {
                 callback.accept(manga, chapter);
             } catch (InterruptedException | InterruptedIOException e) {
                 logger.log(Level.INFO, "Cancelling download task", "");
+                downloadMessageHelper.updateStatus(message, Status.CANCELLED);
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "Error encountered", "", e);
                 downloadMessageHelper.createErrorMessage(e.getLocalizedMessage());

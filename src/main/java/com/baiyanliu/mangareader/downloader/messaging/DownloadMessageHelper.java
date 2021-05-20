@@ -31,6 +31,14 @@ public class DownloadMessageHelper extends MessageFactory {
 
     public void updateCompleted(DownloadMessage message, int completed) {
         message.setCompleted(completed);
+        if (completed == message.getTotal()) {
+            message.setStatus(Status.COMPLETED);
+        }
+        saveAndSend(message);
+    }
+
+    public void updateStatus(DownloadMessage message, Status status) {
+        message.setStatus(status);
         saveAndSend(message);
     }
 
