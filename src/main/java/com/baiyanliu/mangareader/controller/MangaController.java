@@ -2,6 +2,10 @@ package com.baiyanliu.mangareader.controller;
 
 import com.baiyanliu.mangareader.downloader.DownloaderDispatcher;
 import com.baiyanliu.mangareader.downloader.TaskManager;
+import com.baiyanliu.mangareader.downloader.messaging.DownloadMessage;
+import com.baiyanliu.mangareader.downloader.messaging.DownloadMessageHelper;
+import com.baiyanliu.mangareader.downloader.messaging.DownloadMessageRepository;
+import com.baiyanliu.mangareader.downloader.messaging.Status;
 import com.baiyanliu.mangareader.entity.Chapter;
 import com.baiyanliu.mangareader.entity.Manga;
 import com.baiyanliu.mangareader.entity.Page;
@@ -28,9 +32,11 @@ import java.util.logging.Level;
 class MangaController {
     private final MangaRepository mangaRepository;
     private final ChapterRepository chapterRepository;
+    private final DownloadMessageRepository downloadMessageRepository;
     private final SimpMessagingTemplate webSocket;
     private final DownloaderDispatcher downloaderDispatcher;
     private final TaskManager taskManager;
+    private final DownloadMessageHelper downloadMessageHelper;
 
     @GetMapping("/chapters/{manga}")
     public ResponseEntity<CollectionModel<EntityModel<Chapter>>> getAllChapters(@PathVariable("manga") Long mangaId) {
@@ -88,6 +94,14 @@ class MangaController {
     public ResponseEntity<Void> cancelDownload(@PathVariable("id") Long messageId) {
         log.log(Level.INFO, String.format("cancelDownload - id [%d]", messageId));
         taskManager.cancelTask(messageId);
+        return ResponseEntity.ok().build();
+    }
+
+    @RequestMapping("/resolveError/{id}")
+    public ResponseEntity<Void> resolveError(@PathVariable("id") Long messageId) {
+        log.log(Level.INFO, String.format("resolveError - id [%d]", messageId));
+        Optional<DownloadMessage> message = downloadMessageRepository.findById(messageId);
+        message.ifPresent(value -> downloadMessageHelper.updateStatus(value, Status.RESOLVED));
         return ResponseEntity.ok().build();
     }
 }

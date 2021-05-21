@@ -62,13 +62,16 @@ export default class DownloadLog extends React.Component {
         fetch(message._links.cancel.href).then(() => {});
     }
 
+    onResolveError(message) {
+        fetch(message._links.resolve.href).then(() => {});
+    }
+
     getStyle(message) {
-        if (message.status === "COMPLETED") {
-            return " completed";
-        } else if (message.status === "CANCELLED") {
-            return " cancelled";
+        if (message.status === "STARTED") {
+            return "";
+        } else {
+            return " " + message.status.toLowerCase();
         }
-        return "";
     }
 
     formatMessage(message) {
@@ -83,7 +86,9 @@ export default class DownloadLog extends React.Component {
 
     addControls(message) {
         if (message.status === "STARTED") {
-            return <a className="button-cancel-download" onClick={() => this.onCancelDownload(message)}>Cancel</a>;
+            return <a className="button-log-message" onClick={() => this.onCancelDownload(message)}>Cancel</a>;
+        } else if (message.status === "ERROR") {
+            return <a className="button-log-message" onClick={() => this.onResolveError(message)}>Resolve</a>;
         }
     }
 

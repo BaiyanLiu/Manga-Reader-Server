@@ -97,6 +97,7 @@ abstract class Downloader {
                 downloadMessageHelper.updateStatus(message, Status.CANCELLED);
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "Error encountered", "", e);
+                downloadMessageHelper.updateStatus(message, Status.ERROR);
                 downloadMessageHelper.createErrorMessage(e.getLocalizedMessage());
             } finally {
                 taskManager.removeTask(message);
@@ -170,7 +171,7 @@ abstract class Downloader {
                                         page.setImage(image);
                                         chapter.getPages().put(page.getNumber(), page);
                                     } catch (IOException e) {
-                                        e.printStackTrace();
+                                        return false;
                                     }
                                     return true;
                                 });
@@ -198,6 +199,7 @@ abstract class Downloader {
                 downloadMessageHelper.updateStatus(message, Status.CANCELLED);
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "Error encountered", "", e);
+                downloadMessageHelper.updateStatus(message, Status.ERROR);
                 downloadMessageHelper.createErrorMessage(e.getLocalizedMessage());
             } finally {
                 taskManager.removeTask(message);

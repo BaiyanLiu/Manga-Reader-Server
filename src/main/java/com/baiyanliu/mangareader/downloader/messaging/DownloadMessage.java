@@ -20,6 +20,7 @@ import java.util.Date;
 @Inheritance
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @RestResource(path="downloadMessages")
+@Table(indexes = {@Index(columnList = "status")})
 public abstract class DownloadMessage extends LogMessage {
     @GeneratedValue(generator = "downloadMessageId") @Id private long id;
 
