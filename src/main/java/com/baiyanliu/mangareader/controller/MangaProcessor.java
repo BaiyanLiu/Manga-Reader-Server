@@ -17,7 +17,10 @@ public class MangaProcessor implements RepresentationModelProcessor<EntityModel<
     public EntityModel<Manga> process(@NonNull EntityModel<Manga> model) {
         Manga manga = model.getContent();
         if (manga != null) {
-            model.add(linkTo(methodOn(MangaController.class).getAllChapters(manga.getId())).withRel("chapters"));
+            model.add(
+                    linkTo(methodOn(MangaController.class).getAllChapters(manga.getId())).withRel("chapters"),
+                    linkTo(methodOn(MangaController.class).updateMetadata(manga.getId())).withRel("update")
+            );
         }
         return model;
     }

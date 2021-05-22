@@ -76,6 +76,17 @@ class MangaController {
         return ResponseEntity.notFound().build();
     }
 
+    @RequestMapping("/updateMetadata/{manga}")
+    public ResponseEntity<Void> updateMetadata(@PathVariable("manga") Long mangaId) {
+        log.log(Level.INFO, String.format("updateMetadata - manga [%d]", mangaId));
+        Optional<Manga> manga = mangaRepository.findById(mangaId);
+        manga.ifPresent(value -> {
+            Hibernate.initialize(value.getChapters());
+            downloaderDispatcher.downloadMetadata(value);
+        });
+        return ResponseEntity.ok().build();
+    }
+
     @RequestMapping("/downloadChapter")
     public ResponseEntity<Void> downloadChapter(
             @RequestParam("manga") Long mangaId,

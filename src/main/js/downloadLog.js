@@ -58,14 +58,6 @@ export default class DownloadLog extends React.Component {
         this.setState({messages: messages, messageIds: messageIds});
     }
 
-    onCancelDownload(message) {
-        fetch(message._links.cancel.href).then(() => {});
-    }
-
-    onResolveError(message) {
-        fetch(message._links.resolve.href).then(() => {});
-    }
-
     getStyle(message) {
         if (message.status === "STARTED") {
             return "";
@@ -85,10 +77,12 @@ export default class DownloadLog extends React.Component {
     }
 
     addControls(message) {
-        if (message.status === "STARTED") {
-            return <a className="button-log-message" onClick={() => this.onCancelDownload(message)}>Cancel</a>;
-        } else if (message.status === "ERROR") {
-            return <a className="button-log-message" onClick={() => this.onResolveError(message)}>Resolve</a>;
+        if (message._links) {
+            if (message._links.cancel) {
+                return <a className="button-right" onClick={() => fetch(message._links.cancel.href).then(() => {})}>Cancel</a>;
+            } else if (message._links.resolve) {
+                return <a className="button-right" onClick={() => fetch(message._links.resolve.href).then(() => {})}>Resolve</a>;
+            }
         }
     }
 
