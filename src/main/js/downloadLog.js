@@ -58,7 +58,7 @@ export default class DownloadLog extends React.Component {
         this.setState({messages: messages, messageIds: messageIds});
     }
 
-    getStyle(message) {
+    getTextStyle(message) {
         if (message.status === "STARTED") {
             return "";
         } else {
@@ -89,7 +89,7 @@ export default class DownloadLog extends React.Component {
     render() {
         const messages = this.state.messageIds.map(id => {
             const message = this.state.messages[id];
-            return <div className={"line" + this.getStyle(message)}>{this.formatMessage(message)}{this.addControls(message)}</div>;
+            return <div className={"line" + this.getTextStyle(message)}>{this.formatMessage(message)}{this.addControls(message)}</div>;
         });
         return (
             <div>

@@ -12,6 +12,7 @@ import com.baiyanliu.mangareader.entity.Page;
 import com.baiyanliu.mangareader.entity.repository.ChapterRepository;
 import com.baiyanliu.mangareader.entity.repository.MangaRepository;
 import com.baiyanliu.mangareader.messaging.ChapterUpdateMessage;
+import com.baiyanliu.mangareader.messaging.MangaUpdateMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.hibernate.Hibernate;
@@ -20,6 +21,7 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -33,6 +35,7 @@ class MangaController {
     private final MangaRepository mangaRepository;
     private final ChapterRepository chapterRepository;
     private final DownloadMessageRepository downloadMessageRepository;
+
     private final SimpMessagingTemplate webSocket;
     private final DownloaderDispatcher downloaderDispatcher;
     private final TaskManager taskManager;
@@ -53,22 +56,34 @@ class MangaController {
     }
 
     @GetMapping("/page")
+    @Transactional
     public ResponseEntity<EntityModel<Page>> getOnePage(
             @RequestParam("manga") Long mangaId,
             @RequestParam("chapter") String chapterNumber,
             @RequestParam("page") int pageNumber) {
         log.log(Level.INFO, String.format("getOnePage - manga [%d] chapter [%s] page [%d]", mangaId, chapterNumber, pageNumber));
-        Optional<Manga> manga = mangaRepository.findById(mangaId);
-        if (manga.isPresent()) {
-            Map<String, Chapter> chapters = manga.get().getChapters();
+        Optional<Manga> mangaOptional = mangaRepository.findById(mangaId);
+        if (mangaOptional.isPresent()) {
+            Manga manga = mangaOptional.get();
+            Map<String, Chapter> chapters = manga.getChapters();
             if (chapters.containsKey(chapterNumber)) {
                 Chapter chapter = chapters.get(chapterNumber);
                 if (chapter.getPages().containsKey(pageNumber)) {
-                    if (pageNumber == chapter.getLastPage()) {
+
+                    if (pageNumber == chapter.getLastPage() && !chapter.isRead()) {
+                        manga.setLastRead(new Date());
+                        manga.setUnread(manga.getUnread() - 1);
+                        if (manga.getUnread() == 0) {
+                            manga.setRead(true);
+                        }
                         chapter.setRead(true);
+
+                        mangaRepository.save(manga);
                         chapterRepository.save(chapter);
+                        new MangaUpdateMessage(manga).send(webSocket);
                         new ChapterUpdateMessage(mangaId, Collections.singletonList(chapter)).send(webSocket);
                     }
+
                     return ResponseEntity.ok(EntityModel.of(chapter.getPages().get(pageNumber)));
                 }
             }

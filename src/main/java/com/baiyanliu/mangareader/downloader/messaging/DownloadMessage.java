@@ -8,6 +8,8 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.data.rest.core.annotation.RestResource;
 import org.springframework.hateoas.EntityModel;
 
@@ -24,7 +26,7 @@ import java.util.Date;
 public abstract class DownloadMessage extends LogMessage {
     @GeneratedValue(generator = "downloadMessageId") @Id private long id;
 
-    @ManyToOne private Manga manga;
+    @ManyToOne @OnDelete(action = OnDeleteAction.CASCADE) private Manga manga;
     private int total;
     private int completed;
     private Status status;

@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,6 +20,10 @@ public class Manga {
     private String name;
     private Source source;
     private String sourceId;
+    private Date lastRead;
+    private int unread;
+    private boolean read;
+    private boolean ignored;
     @JsonIgnore
     @MapKey(name = "number")
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)

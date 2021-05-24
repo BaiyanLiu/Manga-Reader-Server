@@ -5,6 +5,7 @@ import ReactDOM from 'react-dom';
 import MangaList from "./mangaList";
 import DownloadLog from "./downloadLog";
 import ErrorLog from "./errorLog";
+import SockJsClient from "react-stomp";
 
 class App extends React.Component {
 
@@ -17,6 +18,7 @@ class App extends React.Component {
         this.onCreate = this.onCreate.bind(this);
         this.onUpdate = this.onUpdate.bind(this);
         this.onDelete = this.onDelete.bind(this);
+        this.onMessage = this.onMessage.bind(this);
     }
 
     onNavigate(uri) {
@@ -82,6 +84,17 @@ class App extends React.Component {
         }
     }
 
+    onMessage(message) {
+        const mangas = this.state.mangas;
+        for (let [i, manga] of mangas.entries()) {
+            if (manga.id === message.manga.id) {
+                Object.keys(message.manga).map(key => mangas[i][key] = message.manga[key]);
+                this.setState({mangas: mangas});
+                return;
+            }
+        }
+    }
+
     componentDidMount() {
         document.addEventListener("keydown", this.handleKeyDown)
         this.onNavigate(this.home);
@@ -90,6 +103,10 @@ class App extends React.Component {
     render() {
         return (
             <div>
+                <SockJsClient
+                    url={'http://localhost:8080/events'}
+                    topics={['/topic/manga']}
+                    onMessage={message => this.onMessage(message)}/>
                 <DownloadLog/>
                 <ErrorLog/>
                 <br/>

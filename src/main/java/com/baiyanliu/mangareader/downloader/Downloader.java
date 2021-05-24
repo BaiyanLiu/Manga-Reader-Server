@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 
@@ -85,6 +84,8 @@ abstract class Downloader {
                     if (!manga.getChapters().containsKey(chapterNumber)) {
                         Chapter chapter = new Chapter(manga, chapterNumber, "Chapter " + chapterNumber);
                         manga.getChapters().put(chapter.getNumber(), chapter);
+                        manga.setUnread(manga.getUnread() + 1);
+                        manga.setRead(false);
                     }
                 }
 
@@ -120,7 +121,7 @@ abstract class Downloader {
 
     protected abstract List<String> getChapterNumbers(WebDriver driver);
 
-    public void downloadChapter(Manga manga, String chapterNumber, BiConsumer<Manga, Chapter> callback) {
+    public void downloadChapter(Manga manga, String chapterNumber, Consumer<Chapter> callback) {
         CustomLogger logger = new CustomLogger(log, String.format("downloadChapter - manga [%d] name [%s] source [%s] source ID [%s] chapter [%s] ",
                 manga.getId(), manga.getName(), manga.getSource(), manga.getSourceId(), chapterNumber));
         logger.log(Level.INFO, "Queuing download task", "");
@@ -193,7 +194,7 @@ abstract class Downloader {
                 chapter.setDownloaded(true);
                 logger.log(Level.INFO, "Finished download task", String.format("pages [%d] ", chapter.getLastPage()));
 
-                callback.accept(manga, chapter);
+                callback.accept(chapter);
             } catch (InterruptedException | InterruptedIOException e) {
                 logger.log(Level.INFO, "Cancelling download task", "");
                 downloadMessageHelper.updateStatus(message, Status.CANCELLED);

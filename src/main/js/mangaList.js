@@ -34,6 +34,7 @@ export default class MangaList extends React.Component {
     }
 
     render() {
+        this.props.mangas.sort((a, b) => (a.lastRead === null) - (b.lastRead === null) || b.lastRead > a.lastRead);
         const mangas = this.props.mangas.map(manga =>
             <Manga
                 key={manga._links.self.href}
@@ -64,6 +65,8 @@ export default class MangaList extends React.Component {
                     <tr>
                         <th>Name</th>
                         <th>Source</th>
+                        <th>Last Read</th>
+                        <th>Unread</th>
                         <th/>
                         <th/>
                     </tr>
@@ -98,16 +101,19 @@ class Manga extends React.Component {
     }
 
     render() {
+        const textStyle = this.props.manga.read ? " read" : "";
         return (
             <tr>
                 <td>
-                    <div className="inline-margin">
+                    <div className={"inline-margin" + textStyle}>
                         {this.props.manga.name}
                     </div>
                     <a onClick={this.handleUpdate} className="button-inline">U</a>
                     <ChapterList manga={this.props.manga}/>
                 </td>
-                <td>{this.props.manga.source}</td>
+                <td className={textStyle}>{this.props.manga.source}</td>
+                <td className={textStyle}>{new Date(this.props.manga.lastRead).toLocaleString()}</td>
+                <td className={textStyle}>{this.props.manga.unread}</td>
                 <td>
                     <UpdateDialog
                         manga={this.props.manga}

@@ -22,6 +22,7 @@ public class Chapter {
     private int lastPage;
     private boolean downloaded;
     private boolean read;
+    private boolean ignored;
     @JsonIgnore
     @MapKey(name = "number")
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
