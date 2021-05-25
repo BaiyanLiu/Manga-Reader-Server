@@ -84,8 +84,7 @@ abstract class Downloader {
                     if (!manga.getChapters().containsKey(chapterNumber)) {
                         Chapter chapter = new Chapter(manga, chapterNumber, "Chapter " + chapterNumber);
                         manga.getChapters().put(chapter.getNumber(), chapter);
-                        manga.setUnread(manga.getUnread() + 1);
-                        manga.setRead(false);
+                        manga.updateUnread(1);
                     }
                 }
 

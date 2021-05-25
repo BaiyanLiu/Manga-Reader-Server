@@ -16,7 +16,8 @@ public class ChapterProcessor implements RepresentationModelProcessor<EntityMode
     public static Link[] generateLinks(Chapter chapter) {
         return new Link[] {
                 linkTo(methodOn(MangaController.class).getOnePage(chapter.getManga().getId(), chapter.getNumber(), 1)).withRel("firstPage"),
-                linkTo(methodOn(MangaController.class).downloadChapter(chapter.getManga().getId(), chapter.getNumber())).withRel("download")
+                linkTo(methodOn(MangaController.class).downloadChapter(chapter.getManga().getId(), chapter.getNumber())).withRel("download"),
+                linkTo(methodOn(MangaController.class).ignoreChapter(chapter.getManga().getId(), chapter.getNumber())).withRel("ignore")
         };
     }
 

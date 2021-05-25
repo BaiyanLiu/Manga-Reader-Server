@@ -72,9 +72,8 @@ class MangaController {
 
                     if (pageNumber == chapter.getLastPage() && !chapter.isRead()) {
                         manga.setLastRead(new Date());
-                        manga.setUnread(manga.getUnread() - 1);
-                        if (manga.getUnread() == 0) {
-                            manga.setRead(true);
+                        if (!chapter.isIgnored()) {
+                            manga.updateUnread(-1);
                         }
                         chapter.setRead(true);
 
@@ -113,6 +112,36 @@ class MangaController {
             Hibernate.initialize(value.getChapters().get(chapterNumber).getPages());
             downloaderDispatcher.downloadChapter(value, chapterNumber);
         });
+        return ResponseEntity.ok().build();
+    }
+
+    @RequestMapping("/ignoreChapter")
+    @Transactional
+    public ResponseEntity<Void> ignoreChapter(
+            @RequestParam("manga") Long mangaId,
+            @RequestParam("chapter") String chapterNumber) {
+        log.log(Level.INFO, String.format("ignoreChapter - manga [%d] chapter [%s]", mangaId, chapterNumber));
+        Optional<Manga> mangaOptional = mangaRepository.findById(mangaId);
+        if (mangaOptional.isPresent()) {
+            Manga manga = mangaOptional.get();
+            Map<String, Chapter> chapters = manga.getChapters();
+            if (chapters.containsKey(chapterNumber)) {
+
+                Chapter chapter = chapters.get(chapterNumber);
+                chapter.setIgnored(!chapter.isIgnored());
+                boolean updateManga = !chapter.isRead();
+                if (updateManga) {
+                    manga.updateUnread(chapter.isIgnored() ? -1 : 1);
+                    mangaRepository.save(manga);
+                }
+
+                chapterRepository.save(chapter);
+                if (updateManga) {
+                    new MangaUpdateMessage(manga).send(webSocket);
+                }
+                new ChapterUpdateMessage(mangaId, Collections.singletonList(chapter)).send(webSocket);
+            }
+        }
         return ResponseEntity.ok().build();
     }
 

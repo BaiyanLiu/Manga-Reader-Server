@@ -23,7 +23,6 @@ public class Manga {
     private Date lastRead;
     private int unread;
     private boolean read;
-    private boolean ignored;
     @JsonIgnore
     @MapKey(name = "number")
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
@@ -33,5 +32,10 @@ public class Manga {
         this.name = name;
         this.source = source;
         this.sourceId = sourceId;
+    }
+
+    public void updateUnread(int delta) {
+        unread += delta;
+        read = unread == 0;
     }
 }

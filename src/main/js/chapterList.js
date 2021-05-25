@@ -83,6 +83,7 @@ class Chapter extends React.Component {
     constructor(props) {
         super(props);
         this.handleDownload = this.handleDownload.bind(this);
+        this.handleIgnore = this.handleIgnore.bind(this);
     }
 
     handleDownload(e) {
@@ -90,14 +91,32 @@ class Chapter extends React.Component {
         fetch(this.props.chapter._links.download.href).then(() => {});
     }
 
+    handleIgnore(e) {
+        e.preventDefault();
+        fetch(this.props.chapter._links.ignore.href).then(() => {});
+    }
+
+    getTextStyle(chapter) {
+        if (chapter.ignored) {
+            return " ignored";
+        } else if (chapter.read) {
+            return " read";
+        } else if (!chapter.downloaded) {
+            return " new";
+        } else {
+            return "";
+        }
+    }
+
     render() {
         return (
             <div className="chapter">
-                <div className={"inline-margin" + (this.props.chapter.read ? " read" : this.props.chapter.downloaded ? "" : " new")}>
+                <div className={"inline-margin" + this.getTextStyle(this.props.chapter)}>
                     {this.props.chapter.name}
                 </div>
                 <div className="controls">
                     <a onClick={this.handleDownload} className="button-inline">DL</a>
+                    <a onClick={this.handleIgnore} className="button-inline">IGN</a>
                     <Page
                         key={`page-${this.props.manga.id}-${this.props.chapter.number}`}
                         manga={this.props.manga}

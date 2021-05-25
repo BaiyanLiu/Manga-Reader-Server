@@ -108,7 +108,7 @@ class Manga extends React.Component {
                     <div className={"inline-margin" + textStyle}>
                         {this.props.manga.name}
                     </div>
-                    <a onClick={this.handleUpdate} className="button-inline">U</a>
+                    <a onClick={this.handleUpdate} className="button-inline">UPD</a>
                     <ChapterList manga={this.props.manga}/>
                 </td>
                 <td className={textStyle}>{this.props.manga.source}</td>
