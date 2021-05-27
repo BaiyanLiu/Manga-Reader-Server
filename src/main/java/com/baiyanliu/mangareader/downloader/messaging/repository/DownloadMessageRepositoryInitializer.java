@@ -1,5 +1,7 @@
-package com.baiyanliu.mangareader.downloader.messaging;
+package com.baiyanliu.mangareader.downloader.messaging.repository;
 
+import com.baiyanliu.mangareader.downloader.messaging.DownloadMessage;
+import com.baiyanliu.mangareader.downloader.messaging.Status;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class MangaUpdateMessage extends Message {
+public class MangaMessage extends Message {
     @Getter private final Manga manga;
 
     @Override

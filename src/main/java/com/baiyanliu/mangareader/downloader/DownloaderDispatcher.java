@@ -6,11 +6,8 @@ import com.baiyanliu.mangareader.entity.Manga;
 import com.baiyanliu.mangareader.entity.Source;
 import com.baiyanliu.mangareader.entity.repository.ChapterRepository;
 import com.baiyanliu.mangareader.entity.repository.MangaRepository;
-import com.baiyanliu.mangareader.messaging.ChapterUpdateMessage;
-import com.baiyanliu.mangareader.messaging.MangaUpdateMessage;
 import com.google.common.collect.ImmutableMap;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -22,13 +19,13 @@ public class DownloaderDispatcher {
 
     private final MangaRepository mangaRepository;
     private final ChapterRepository chapterRepository;
-    private final SimpMessagingTemplate webSocket;
+    private final DownloadMessageHelper downloadMessageHelper;
 
     @Autowired
-    public DownloaderDispatcher(MangaRepository mangaRepository, ChapterRepository chapterRepository, SimpMessagingTemplate webSocket, DownloadMessageHelper downloadMessageHelper, TaskManager taskManager) {
+    public DownloaderDispatcher(MangaRepository mangaRepository, ChapterRepository chapterRepository, DownloadMessageHelper downloadMessageHelper, TaskManager taskManager) {
         this.mangaRepository = mangaRepository;
         this.chapterRepository = chapterRepository;
-        this.webSocket = webSocket;
+        this.downloadMessageHelper = downloadMessageHelper;
         downloaders = ImmutableMap.of(
                 Source.MANGA_SEE, new MangaSeeDownloader(downloadMessageHelper, taskManager)
         );
@@ -40,8 +37,8 @@ public class DownloaderDispatcher {
 
     private void onMetadataDownloaded(Manga manga) {
         mangaRepository.save(manga);
-        new MangaUpdateMessage(manga).send(webSocket);
-        new ChapterUpdateMessage(manga.getId(), manga.getChapters().values()).send(webSocket);
+        downloadMessageHelper.createMangaMessage(manga);
+        downloadMessageHelper.createChapterMessage(manga, manga.getChapters().values());
     }
 
     public void downloadChapter(Manga manga, String chapterNumber) {
@@ -50,6 +47,6 @@ public class DownloaderDispatcher {
 
     private void onChapterDownloaded(Chapter chapter) {
         chapterRepository.save(chapter);
-        new ChapterUpdateMessage(chapter.getManga().getId(), Collections.singletonList(chapter)).send(webSocket);
+        downloadMessageHelper.createChapterMessage(chapter.getManga(), Collections.singletonList(chapter));
     }
 }

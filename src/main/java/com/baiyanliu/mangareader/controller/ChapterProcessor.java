@@ -14,10 +14,12 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class ChapterProcessor implements RepresentationModelProcessor<EntityModel<Chapter>> {
 
     public static Link[] generateLinks(Chapter chapter) {
+        Long mangaId = chapter.getManga().getId();
+        String chapterNumber = chapter.getNumber();
         return new Link[] {
-                linkTo(methodOn(MangaController.class).getOnePage(chapter.getManga().getId(), chapter.getNumber(), 1)).withRel("firstPage"),
-                linkTo(methodOn(MangaController.class).downloadChapter(chapter.getManga().getId(), chapter.getNumber())).withRel("download"),
-                linkTo(methodOn(MangaController.class).ignoreChapter(chapter.getManga().getId(), chapter.getNumber())).withRel("ignore")
+                linkTo(methodOn(MangaController.class).getOnePage(mangaId, chapterNumber, 1)).withRel("firstPage"),
+                linkTo(methodOn(MangaController.class).downloadChapter(mangaId, chapterNumber)).withRel("download"),
+                linkTo(methodOn(MangaController.class).ignoreChapter(mangaId, chapterNumber)).withRel("ignore")
         };
     }
 

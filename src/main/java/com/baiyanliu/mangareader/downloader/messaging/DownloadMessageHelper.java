@@ -1,5 +1,7 @@
 package com.baiyanliu.mangareader.downloader.messaging;
 
+import com.baiyanliu.mangareader.downloader.messaging.repository.DownloadMessageRepository;
+import com.baiyanliu.mangareader.downloader.messaging.repository.UpdateMessageRepository;
 import com.baiyanliu.mangareader.entity.Manga;
 import com.baiyanliu.mangareader.messaging.ErrorMessageRepository;
 import com.baiyanliu.mangareader.messaging.MessageFactory;
@@ -10,11 +12,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class DownloadMessageHelper extends MessageFactory {
     private final DownloadMessageRepository downloadMessageRepository;
+    private final UpdateMessageRepository updateMessageRepository;
 
     @Autowired
-    public DownloadMessageHelper(DownloadMessageRepository downloadMessageRepository, ErrorMessageRepository errorMessageRepository, SimpMessagingTemplate webSocket) {
+    public DownloadMessageHelper(DownloadMessageRepository downloadMessageRepository, UpdateMessageRepository updateMessageRepository,
+                                 ErrorMessageRepository errorMessageRepository, SimpMessagingTemplate webSocket) {
         super(webSocket, errorMessageRepository);
         this.downloadMessageRepository = downloadMessageRepository;
+        this.updateMessageRepository = updateMessageRepository;
     }
 
     public DownloadMessage createDownloadMetadataMessage(Manga manga) {
@@ -27,6 +32,12 @@ public class DownloadMessageHelper extends MessageFactory {
         DownloadMessage message = new DownloadChapterMessage(manga, chapterNumber);
         saveAndSend(message);
         return message;
+    }
+
+    public void createUpdateMessage(Manga manga, String chapterNumber) {
+        UpdateMessage message = new UpdateMessage(manga, chapterNumber);
+        updateMessageRepository.save(message);
+        message.send(webSocket);
     }
 
     public void updateCompleted(DownloadMessage message, int completed) {

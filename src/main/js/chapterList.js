@@ -40,7 +40,7 @@ export default class ChapterList extends React.Component {
     }
 
     onMessage(message) {
-        if (!this.hasLoaded || message.mangaId !== this.props.manga.id) {
+        if (!this.hasLoaded || message.manga.id !== this.props.manga.id) {
             return;
         }
         const chapters = this.state.chapters;

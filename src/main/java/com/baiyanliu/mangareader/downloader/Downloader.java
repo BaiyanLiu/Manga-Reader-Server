@@ -56,6 +56,7 @@ abstract class Downloader {
         DownloadMessage message = downloadMessageHelper.createDownloadMetadataMessage(manga);
 
         Future<Void> task = executor.submit(() -> {
+            boolean isNew = manga.getChapters().isEmpty();
             WebDriver driver = null;
             try {
                 String url = getMetadataUrl(manga);
@@ -83,8 +84,11 @@ abstract class Downloader {
                     logger.log(Level.INFO, "Found chapter", String.format("URL [%s] chapter [%s] ", url, chapterNumber));
                     if (!manga.getChapters().containsKey(chapterNumber)) {
                         Chapter chapter = new Chapter(manga, chapterNumber, "Chapter " + chapterNumber);
-                        manga.getChapters().put(chapter.getNumber(), chapter);
+                        manga.getChapters().put(chapterNumber, chapter);
                         manga.updateUnread(1);
+                        if (!isNew) {
+                            downloadMessageHelper.createUpdateMessage(manga, chapterNumber);
+                        }
                     }
                 }
 

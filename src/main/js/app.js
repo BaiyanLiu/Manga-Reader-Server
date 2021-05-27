@@ -4,6 +4,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import MangaList from "./mangaList";
 import DownloadLog from "./downloadLog";
+import UpdateLog from "./updateLog";
 import ErrorLog from "./errorLog";
 import SockJsClient from "react-stomp";
 
@@ -108,6 +109,7 @@ class App extends React.Component {
                     topics={['/topic/manga']}
                     onMessage={message => this.onMessage(message)}/>
                 <DownloadLog/>
+                <UpdateLog/>
                 <ErrorLog/>
                 <br/>
                 <CreateDialog

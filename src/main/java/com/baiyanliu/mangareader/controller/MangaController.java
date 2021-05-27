@@ -4,15 +4,14 @@ import com.baiyanliu.mangareader.downloader.DownloaderDispatcher;
 import com.baiyanliu.mangareader.downloader.TaskManager;
 import com.baiyanliu.mangareader.downloader.messaging.DownloadMessage;
 import com.baiyanliu.mangareader.downloader.messaging.DownloadMessageHelper;
-import com.baiyanliu.mangareader.downloader.messaging.DownloadMessageRepository;
+import com.baiyanliu.mangareader.downloader.messaging.repository.DownloadMessageRepository;
 import com.baiyanliu.mangareader.downloader.messaging.Status;
 import com.baiyanliu.mangareader.entity.Chapter;
 import com.baiyanliu.mangareader.entity.Manga;
 import com.baiyanliu.mangareader.entity.Page;
 import com.baiyanliu.mangareader.entity.repository.ChapterRepository;
 import com.baiyanliu.mangareader.entity.repository.MangaRepository;
-import com.baiyanliu.mangareader.messaging.ChapterUpdateMessage;
-import com.baiyanliu.mangareader.messaging.MangaUpdateMessage;
+import com.baiyanliu.mangareader.messaging.MessageFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.hibernate.Hibernate;
@@ -20,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,10 +34,10 @@ class MangaController {
     private final ChapterRepository chapterRepository;
     private final DownloadMessageRepository downloadMessageRepository;
 
-    private final SimpMessagingTemplate webSocket;
     private final DownloaderDispatcher downloaderDispatcher;
     private final TaskManager taskManager;
     private final DownloadMessageHelper downloadMessageHelper;
+    private final MessageFactory messageFactory;
 
     @GetMapping("/chapters/{manga}")
     public ResponseEntity<CollectionModel<EntityModel<Chapter>>> getAllChapters(@PathVariable("manga") Long mangaId) {
@@ -79,8 +77,8 @@ class MangaController {
 
                         mangaRepository.save(manga);
                         chapterRepository.save(chapter);
-                        new MangaUpdateMessage(manga).send(webSocket);
-                        new ChapterUpdateMessage(mangaId, Collections.singletonList(chapter)).send(webSocket);
+                        messageFactory.createMangaMessage(manga);
+                        messageFactory.createChapterMessage(manga, Collections.singletonList(chapter));
                     }
 
                     return ResponseEntity.ok(EntityModel.of(chapter.getPages().get(pageNumber)));
@@ -137,9 +135,9 @@ class MangaController {
 
                 chapterRepository.save(chapter);
                 if (updateManga) {
-                    new MangaUpdateMessage(manga).send(webSocket);
+                    messageFactory.createMangaMessage(manga);
                 }
-                new ChapterUpdateMessage(mangaId, Collections.singletonList(chapter)).send(webSocket);
+                messageFactory.createChapterMessage(manga, Collections.singletonList(chapter));
             }
         }
         return ResponseEntity.ok().build();
