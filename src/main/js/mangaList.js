@@ -88,6 +88,7 @@ class Manga extends React.Component {
         super(props);
         this.handleDelete = this.handleDelete.bind(this);
         this.handleUpdate = this.handleUpdate.bind(this);
+        this.handleDownload = this.handleDownload.bind(this);
     }
 
     handleDelete(e) {
@@ -100,6 +101,11 @@ class Manga extends React.Component {
         fetch(this.props.manga._links.update.href).then(() => {});
     }
 
+    handleDownload(e) {
+        e.preventDefault();
+        fetch(this.props.manga._links.download.href).then(() => {});
+    }
+
     render() {
         const textStyle = this.props.manga.read ? " read" : "";
         return (
@@ -109,6 +115,7 @@ class Manga extends React.Component {
                         {this.props.manga.name}
                     </div>
                     <a onClick={this.handleUpdate} className="button-inline">UPD</a>
+                    <a onClick={this.handleDownload} className="button-inline">DL</a>
                     <ChapterList manga={this.props.manga}/>
                 </td>
                 <td className={textStyle}>{this.props.manga.source}</td>

@@ -98,7 +98,6 @@ abstract class Downloader {
                 callback.accept(manga);
             } catch (InterruptedException | InterruptedIOException e) {
                 logger.log(Level.INFO, "Cancelling download task", "");
-                downloadMessageHelper.updateStatus(message, Status.CANCELLED);
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "Error encountered", "", e);
                 downloadMessageHelper.updateStatus(message, Status.ERROR);
@@ -200,7 +199,6 @@ abstract class Downloader {
                 callback.accept(chapter);
             } catch (InterruptedException | InterruptedIOException e) {
                 logger.log(Level.INFO, "Cancelling download task", "");
-                downloadMessageHelper.updateStatus(message, Status.CANCELLED);
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "Error encountered", "", e);
                 downloadMessageHelper.updateStatus(message, Status.ERROR);

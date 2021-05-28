@@ -4,8 +4,8 @@ import com.baiyanliu.mangareader.downloader.DownloaderDispatcher;
 import com.baiyanliu.mangareader.downloader.TaskManager;
 import com.baiyanliu.mangareader.downloader.messaging.DownloadMessage;
 import com.baiyanliu.mangareader.downloader.messaging.DownloadMessageHelper;
-import com.baiyanliu.mangareader.downloader.messaging.repository.DownloadMessageRepository;
 import com.baiyanliu.mangareader.downloader.messaging.Status;
+import com.baiyanliu.mangareader.downloader.messaging.repository.DownloadMessageRepository;
 import com.baiyanliu.mangareader.entity.Chapter;
 import com.baiyanliu.mangareader.entity.Manga;
 import com.baiyanliu.mangareader.entity.Page;
@@ -95,6 +95,22 @@ class MangaController {
         manga.ifPresent(value -> {
             Hibernate.initialize(value.getChapters());
             downloaderDispatcher.downloadMetadata(value);
+        });
+        return ResponseEntity.ok().build();
+    }
+
+    @RequestMapping("/downloadManga/{manga}")
+    public ResponseEntity<Void> downloadManga(@PathVariable("manga") Long mangaId) {
+        log.log(Level.INFO, String.format("downloadManga - manga [%d]", mangaId));
+        Optional<Manga> manga = mangaRepository.findById(mangaId);
+        manga.ifPresent(value -> {
+            Hibernate.initialize(value.getChapters());
+            for (Chapter chapter : value.getChapters().values()) {
+                if (!chapter.isIgnored() && !chapter.isDownloaded()) {
+                    Hibernate.initialize(chapter.getPages());
+                    downloaderDispatcher.downloadChapter(value, chapter.getNumber());
+                }
+            }
         });
         return ResponseEntity.ok().build();
     }
