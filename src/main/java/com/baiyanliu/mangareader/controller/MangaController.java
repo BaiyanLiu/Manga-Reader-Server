@@ -2,7 +2,6 @@ package com.baiyanliu.mangareader.controller;
 
 import com.baiyanliu.mangareader.downloader.DownloaderDispatcher;
 import com.baiyanliu.mangareader.downloader.TaskManager;
-import com.baiyanliu.mangareader.downloader.messaging.DownloadMessage;
 import com.baiyanliu.mangareader.downloader.messaging.DownloadMessageHelper;
 import com.baiyanliu.mangareader.downloader.messaging.Status;
 import com.baiyanliu.mangareader.downloader.messaging.repository.DownloadMessageRepository;
@@ -22,8 +21,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 @Log
 @RestController
@@ -40,14 +43,11 @@ class MangaController {
     private final MessageFactory messageFactory;
 
     @GetMapping("/chapters/{manga}")
-    public ResponseEntity<CollectionModel<EntityModel<Chapter>>> getAllChapters(@PathVariable("manga") Long mangaId) {
-        log.log(Level.INFO, String.format("getAllChapters - manga [%d]", mangaId));
+    public ResponseEntity<CollectionModel<EntityModel<Chapter>>> getChapters(@PathVariable("manga") Long mangaId) {
+        log.log(Level.INFO, String.format("getChapters - manga [%d]", mangaId));
         Optional<Manga> manga = mangaRepository.findById(mangaId);
         if (manga.isPresent()) {
-            List<EntityModel<Chapter>> chapters = new ArrayList<>();
-            for (Chapter chapter : manga.get().getChapters().values()) {
-                chapters.add(EntityModel.of(chapter));
-            }
+            List<EntityModel<Chapter>> chapters = manga.get().getChapters().values().stream().map(EntityModel::of).collect(Collectors.toList());
             return ResponseEntity.ok(CollectionModel.of(chapters));
         }
         return ResponseEntity.notFound().build();
@@ -55,18 +55,18 @@ class MangaController {
 
     @GetMapping("/page")
     @Transactional
-    public ResponseEntity<EntityModel<Page>> getOnePage(
+    public ResponseEntity<EntityModel<Page>> getPage(
             @RequestParam("manga") Long mangaId,
             @RequestParam("chapter") String chapterNumber,
             @RequestParam("page") int pageNumber) {
-        log.log(Level.INFO, String.format("getOnePage - manga [%d] chapter [%s] page [%d]", mangaId, chapterNumber, pageNumber));
+        log.log(Level.INFO, String.format("getPage - manga [%d] chapter [%s] page [%d]", mangaId, chapterNumber, pageNumber));
         Optional<Manga> mangaOptional = mangaRepository.findById(mangaId);
         if (mangaOptional.isPresent()) {
             Manga manga = mangaOptional.get();
-            Map<String, Chapter> chapters = manga.getChapters();
-            if (chapters.containsKey(chapterNumber)) {
-                Chapter chapter = chapters.get(chapterNumber);
-                if (chapter.getPages().containsKey(pageNumber)) {
+            Chapter chapter = manga.getChapters().get(chapterNumber);
+            if (chapter != null) {
+                Page page = chapter.getPages().get(pageNumber);
+                if (page != null) {
 
                     if (pageNumber == chapter.getLastPage() && !chapter.isRead()) {
                         manga.setLastRead(new Date());
@@ -81,38 +81,53 @@ class MangaController {
                         messageFactory.createChapterMessage(manga, Collections.singletonList(chapter));
                     }
 
-                    return ResponseEntity.ok(EntityModel.of(chapter.getPages().get(pageNumber)));
+                    return ResponseEntity.ok(EntityModel.of(page));
                 }
             }
         }
         return ResponseEntity.notFound().build();
     }
 
-    @RequestMapping("/updateMetadata/{manga}")
-    public ResponseEntity<Void> updateMetadata(@PathVariable("manga") Long mangaId) {
-        log.log(Level.INFO, String.format("updateMetadata - manga [%d]", mangaId));
-        Optional<Manga> manga = mangaRepository.findById(mangaId);
-        manga.ifPresent(value -> {
-            Hibernate.initialize(value.getChapters());
-            downloaderDispatcher.downloadMetadata(value);
-        });
+    @RequestMapping("/updateManga/{manga}")
+    public ResponseEntity<Void> updateManga(@PathVariable("manga") Long mangaId) {
+        log.log(Level.INFO, String.format("updateManga - manga [%d]", mangaId));
+        mangaRepository.findById(mangaId).ifPresent(this::updateManga);
         return ResponseEntity.ok().build();
+    }
+
+    @RequestMapping("/updateAll")
+    public ResponseEntity<Void> updateAll() {
+        log.log(Level.INFO, "updateAll");
+        mangaRepository.findAll().forEach(this::updateManga);
+        return ResponseEntity.ok().build();
+    }
+
+    private void updateManga(Manga manga) {
+        Hibernate.initialize(manga.getChapters());
+        downloaderDispatcher.downloadMetadata(manga);
     }
 
     @RequestMapping("/downloadManga/{manga}")
     public ResponseEntity<Void> downloadManga(@PathVariable("manga") Long mangaId) {
         log.log(Level.INFO, String.format("downloadManga - manga [%d]", mangaId));
-        Optional<Manga> manga = mangaRepository.findById(mangaId);
-        manga.ifPresent(value -> {
-            Hibernate.initialize(value.getChapters());
-            for (Chapter chapter : value.getChapters().values()) {
-                if (!chapter.isIgnored() && !chapter.isDownloaded()) {
-                    Hibernate.initialize(chapter.getPages());
-                    downloaderDispatcher.downloadChapter(value, chapter.getNumber());
-                }
-            }
-        });
+        mangaRepository.findById(mangaId).ifPresent(this::downloadManga);
         return ResponseEntity.ok().build();
+    }
+
+    @RequestMapping("/downloadAll")
+    public ResponseEntity<Void> downloadAllManga() {
+        log.log(Level.INFO, "downloadAllManga");
+        mangaRepository.findAll().forEach(this::downloadManga);
+        return ResponseEntity.ok().build();
+    }
+
+    private void downloadManga(Manga manga) {
+        Hibernate.initialize(manga.getChapters());
+        for (Chapter chapter : manga.getChapters().values()) {
+            if (!chapter.isIgnored() && !chapter.isDownloaded()) {
+                downloadChapter(manga, chapter.getNumber());
+            }
+        }
     }
 
     @RequestMapping("/downloadChapter")
@@ -120,13 +135,16 @@ class MangaController {
             @RequestParam("manga") Long mangaId,
             @RequestParam("chapter") String chapterNumber) {
         log.log(Level.INFO, String.format("downloadChapter - manga [%d] chapter [%s]", mangaId, chapterNumber));
-        Optional<Manga> manga = mangaRepository.findById(mangaId);
-        manga.ifPresent(value -> {
-            Hibernate.initialize(value.getChapters());
-            Hibernate.initialize(value.getChapters().get(chapterNumber).getPages());
-            downloaderDispatcher.downloadChapter(value, chapterNumber);
+        mangaRepository.findById(mangaId).ifPresent(manga -> {
+            Hibernate.initialize(manga.getChapters());
+            downloadChapter(manga, chapterNumber);
         });
         return ResponseEntity.ok().build();
+    }
+
+    private void downloadChapter(Manga manga, String chapterNumber) {
+        Hibernate.initialize(manga.getChapters().get(chapterNumber).getPages());
+        downloaderDispatcher.downloadChapter(manga, chapterNumber);
     }
 
     @RequestMapping("/ignoreChapter")
@@ -135,13 +153,9 @@ class MangaController {
             @RequestParam("manga") Long mangaId,
             @RequestParam("chapter") String chapterNumber) {
         log.log(Level.INFO, String.format("ignoreChapter - manga [%d] chapter [%s]", mangaId, chapterNumber));
-        Optional<Manga> mangaOptional = mangaRepository.findById(mangaId);
-        if (mangaOptional.isPresent()) {
-            Manga manga = mangaOptional.get();
-            Map<String, Chapter> chapters = manga.getChapters();
-            if (chapters.containsKey(chapterNumber)) {
-
-                Chapter chapter = chapters.get(chapterNumber);
+        mangaRepository.findById(mangaId).ifPresent(manga -> {
+            Chapter chapter = manga.getChapters().get(chapterNumber);
+            if (chapter != null) {
                 chapter.setIgnored(!chapter.isIgnored());
                 boolean updateManga = !chapter.isRead();
                 if (updateManga) {
@@ -155,7 +169,7 @@ class MangaController {
                 }
                 messageFactory.createChapterMessage(manga, Collections.singletonList(chapter));
             }
-        }
+        });
         return ResponseEntity.ok().build();
     }
 
@@ -169,8 +183,7 @@ class MangaController {
     @RequestMapping("/resolveError/{id}")
     public ResponseEntity<Void> resolveError(@PathVariable("id") Long messageId) {
         log.log(Level.INFO, String.format("resolveError - id [%d]", messageId));
-        Optional<DownloadMessage> message = downloadMessageRepository.findById(messageId);
-        message.ifPresent(value -> downloadMessageHelper.updateStatus(value, Status.RESOLVED));
+        downloadMessageRepository.findById(messageId).ifPresent(message -> downloadMessageHelper.updateStatus(message, Status.RESOLVED));
         return ResponseEntity.ok().build();
     }
 }

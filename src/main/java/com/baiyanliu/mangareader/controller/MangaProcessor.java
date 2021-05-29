@@ -19,8 +19,8 @@ public class MangaProcessor implements RepresentationModelProcessor<EntityModel<
         if (manga != null) {
             Long mangaId = manga.getId();
             model.add(
-                    linkTo(methodOn(MangaController.class).getAllChapters(mangaId)).withRel("chapters"),
-                    linkTo(methodOn(MangaController.class).updateMetadata(mangaId)).withRel("update"),
+                    linkTo(methodOn(MangaController.class).getChapters(mangaId)).withRel("chapters"),
+                    linkTo(methodOn(MangaController.class).updateManga(mangaId)).withRel("update"),
                     linkTo(methodOn(MangaController.class).downloadManga(mangaId)).withRel("download")
             );
         }

@@ -23,10 +23,10 @@ public class PageProcessor implements RepresentationModelProcessor<EntityModel<P
             int pageNumber = page.getNumber();
 
             if (pageNumber > 1) {
-                model.add(linkTo(methodOn(MangaController.class).getOnePage(mangaId, chapter.getNumber(), pageNumber - 1)).withRel("prev"));
+                model.add(linkTo(methodOn(MangaController.class).getPage(mangaId, chapter.getNumber(), pageNumber - 1)).withRel("prev"));
             }
             if (pageNumber != chapter.getLastPage()) {
-                model.add(linkTo(methodOn(MangaController.class).getOnePage(mangaId, chapter.getNumber(), pageNumber + 1)).withRel("next"));
+                model.add(linkTo(methodOn(MangaController.class).getPage(mangaId, chapter.getNumber(), pageNumber + 1)).withRel("next"));
             }
         }
         return model;

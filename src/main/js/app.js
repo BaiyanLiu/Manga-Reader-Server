@@ -112,6 +112,9 @@ class App extends React.Component {
                 <UpdateLog/>
                 <ErrorLog/>
                 <br/>
+                <a onClick={() => fetch('api/updateAll')} className="button-inline">Update</a>
+                <a onClick={() => fetch('api/downloadAll')} className="button-inline">Download</a>
+                <br/><br/>
                 <CreateDialog
                     fields={this.state.fields}
                     onCreate={this.onCreate}/>

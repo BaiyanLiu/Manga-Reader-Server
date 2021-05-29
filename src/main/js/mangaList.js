@@ -87,23 +87,11 @@ class Manga extends React.Component {
     constructor(props) {
         super(props);
         this.handleDelete = this.handleDelete.bind(this);
-        this.handleUpdate = this.handleUpdate.bind(this);
-        this.handleDownload = this.handleDownload.bind(this);
     }
 
     handleDelete(e) {
         e.preventDefault();
         this.props.onDelete(this.props.manga);
-    }
-
-    handleUpdate(e) {
-        e.preventDefault();
-        fetch(this.props.manga._links.update.href).then(() => {});
-    }
-
-    handleDownload(e) {
-        e.preventDefault();
-        fetch(this.props.manga._links.download.href).then(() => {});
     }
 
     render() {
@@ -114,8 +102,8 @@ class Manga extends React.Component {
                     <div className={"inline-margin" + textStyle}>
                         {this.props.manga.name}
                     </div>
-                    <a onClick={this.handleUpdate} className="button-inline">UPD</a>
-                    <a onClick={this.handleDownload} className="button-inline">DL</a>
+                    <a onClick={() => fetch(this.props.manga._links.update.href)} className="button-inline">UPD</a>
+                    <a onClick={() => fetch(this.props.manga._links.download.href)} className="button-inline">DL</a>
                     <ChapterList manga={this.props.manga}/>
                 </td>
                 <td className={textStyle}>{this.props.manga.source}</td>
