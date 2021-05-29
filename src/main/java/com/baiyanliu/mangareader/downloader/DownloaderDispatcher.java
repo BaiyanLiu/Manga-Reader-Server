@@ -8,12 +8,12 @@ import com.baiyanliu.mangareader.entity.repository.ChapterRepository;
 import com.baiyanliu.mangareader.entity.repository.MangaRepository;
 import com.google.common.collect.ImmutableMap;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.Map;
 
-@Service
+@Component
 public class DownloaderDispatcher {
     private final Map<Source, Downloader> downloaders;
 

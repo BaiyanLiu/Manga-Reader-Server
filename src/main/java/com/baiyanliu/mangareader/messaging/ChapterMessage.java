@@ -10,9 +10,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+@Getter
 public class ChapterMessage extends Message {
-    @Getter private final Manga manga;
-    @Getter private final List<EntityModel<Chapter>> chapters = new ArrayList<>();
+    private final Manga manga;
+    private final List<EntityModel<Chapter>> chapters = new ArrayList<>();
 
     public ChapterMessage(Manga manga, Collection<Chapter> chapters) {
         this.manga = manga;

@@ -7,9 +7,9 @@ import com.baiyanliu.mangareader.messaging.ErrorMessageRepository;
 import com.baiyanliu.mangareader.messaging.MessageFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
+@Component
 public class DownloadMessageHelper extends MessageFactory {
     private final DownloadMessageRepository downloadMessageRepository;
     private final UpdateMessageRepository updateMessageRepository;

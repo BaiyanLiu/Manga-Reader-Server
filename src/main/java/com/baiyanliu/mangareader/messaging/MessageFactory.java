@@ -5,12 +5,12 @@ import com.baiyanliu.mangareader.entity.Manga;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 
+@Component
 @RequiredArgsConstructor(onConstructor = @__({@Autowired}))
-@Service
 public class MessageFactory {
     protected final SimpMessagingTemplate webSocket;
 

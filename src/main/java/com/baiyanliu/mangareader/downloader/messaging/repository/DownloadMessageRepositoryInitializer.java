@@ -5,14 +5,14 @@ import com.baiyanliu.mangareader.downloader.messaging.Status;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.logging.Level;
 
-@Component
 @Log
 @RequiredArgsConstructor(onConstructor = @__({@Autowired}))
+@Service
 public class DownloadMessageRepositoryInitializer {
     private final DownloadMessageRepository repository;
 

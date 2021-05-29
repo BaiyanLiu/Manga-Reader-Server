@@ -6,15 +6,15 @@ import com.baiyanliu.mangareader.downloader.messaging.Status;
 import com.baiyanliu.mangareader.downloader.messaging.repository.DownloadMessageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Future;
 
+@Component
 @RequiredArgsConstructor(onConstructor = @__({@Autowired}))
-@Service
 public class TaskManager {
     private final Map<Long, Future<Void>> tasks = new HashMap<>();
 
