@@ -9,13 +9,8 @@ export default class DownloadLog extends React.Component {
         super(props);
         this.hasLoaded = false;
         this.state = {messages: {}, messageIds: [], pageSize: 100};
-        this.logDiv = React.createRef();
         this.handleShow = this.handleShow.bind(this);
         this.onMessage = this.onMessage.bind(this);
-    }
-
-    componentDidUpdate() {
-        this.logDiv.current.scrollTop = this.logDiv.current.scrollHeight;
     }
 
     handleShow(e) {
@@ -25,8 +20,7 @@ export default class DownloadLog extends React.Component {
                 .then(response => response.json())
                 .then(data => {
                     this.hasLoaded = true;
-                    const messages = {};
-                    const messageIds = [];
+                    const messages = {}, messageIds = [];
                     this.addMessages(messages, messageIds, data._embedded.downloadMetadataMessages);
                     this.addMessages(messages, messageIds, data._embedded.downloadChapterMessages);
                     messageIds.sort((a, b) => parseInt(a) - parseInt(b));
@@ -79,9 +73,9 @@ export default class DownloadLog extends React.Component {
     addControls(message) {
         if (message._links) {
             if (message._links.cancel) {
-                return <a className="button-right" onClick={() => fetch(message._links.cancel.href).then(() => {})}>Cancel</a>;
+                return <a className="button-right" onClick={() => fetch(message._links.cancel.href)}>Cancel</a>;
             } else if (message._links.resolve) {
-                return <a className="button-right" onClick={() => fetch(message._links.resolve.href).then(() => {})}>Resolve</a>;
+                return <a className="button-right" onClick={() => fetch(message._links.resolve.href)}>Resolve</a>;
             }
         }
     }
@@ -102,7 +96,7 @@ export default class DownloadLog extends React.Component {
                     <div className="popup-big">
                         <h2>Downloads</h2>
                         <a href="#" className="close">X</a>
-                        <div ref={this.logDiv} className="log">
+                        <div className="log">
                             {messages}
                         </div>
                     </div>

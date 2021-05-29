@@ -21,8 +21,7 @@ export default class ChapterList extends React.Component {
                 .then(response => response.json())
                 .then(data => {
                     this.hasLoaded = true;
-                    const chapters = {};
-                    const chapterNumbers = [];
+                    const chapters = {}, chapterNumbers = [];
                     data._embedded.chapters.map(chapter => {
                         chapters[chapter.number] = chapter;
                         chapterNumbers.push(chapter.number);

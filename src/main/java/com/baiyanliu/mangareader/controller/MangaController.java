@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor(onConstructor = @__({@Autowired}))
-class MangaController {
+public class MangaController {
     private final MangaRepository mangaRepository;
     private final ChapterRepository chapterRepository;
     private final DownloadMessageRepository downloadMessageRepository;
@@ -96,6 +96,7 @@ class MangaController {
     }
 
     @RequestMapping("/updateAll")
+    @Transactional
     public ResponseEntity<Void> updateAll() {
         log.log(Level.INFO, "updateAll");
         mangaRepository.findAll().forEach(this::updateManga);
@@ -115,8 +116,9 @@ class MangaController {
     }
 
     @RequestMapping("/downloadAll")
-    public ResponseEntity<Void> downloadAllManga() {
-        log.log(Level.INFO, "downloadAllManga");
+    @Transactional
+    public ResponseEntity<Void> downloadAll() {
+        log.log(Level.INFO, "downloadAll");
         mangaRepository.findAll().forEach(this::downloadManga);
         return ResponseEntity.ok().build();
     }
