@@ -27,8 +27,8 @@ public class MessageFactory {
         message.send(webSocket);
     }
 
-    public void createChapterMessage(Manga manga, Collection<Chapter> chapters) {
-        ChapterMessage message = new ChapterMessage(manga, chapters);
+    public void createChapterMessage(Manga manga, Collection<Chapter> chapters, UpdateType updateType) {
+        ChapterMessage message = new ChapterMessage(manga, chapters, updateType);
         message.send(webSocket);
     }
 }

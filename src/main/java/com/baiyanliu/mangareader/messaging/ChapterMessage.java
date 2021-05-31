@@ -14,12 +14,14 @@ import java.util.List;
 public class ChapterMessage extends Message {
     private final Manga manga;
     private final List<EntityModel<Chapter>> chapters = new ArrayList<>();
+    private final UpdateType updateType;
 
-    public ChapterMessage(Manga manga, Collection<Chapter> chapters) {
+    public ChapterMessage(Manga manga, Collection<Chapter> chapters, UpdateType updateType) {
         this.manga = manga;
         for (Chapter chapter : chapters) {
             this.chapters.add(EntityModel.of(chapter, ChapterProcessor.generateLinks(chapter)));
         }
+        this.updateType = updateType;
     }
 
     @Override

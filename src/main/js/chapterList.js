@@ -43,12 +43,17 @@ export default class ChapterList extends React.Component {
             return;
         }
         const chapters = this.state.chapters;
-        const chapterNumbers = this.state.chapterNumbers;
+        let chapterNumbers = this.state.chapterNumbers;
         message.chapters.map(chapter => {
-            if (!(chapter.number in chapters)) {
-                chapterNumbers.push(chapter.number);
+            if (message.updateType === "DELETE") {
+                chapterNumbers = chapterNumbers.filter(item => item !== chapter.number);
+                delete chapters[chapter.number];
+            } else {
+                if (!(chapter.number in chapters)) {
+                    chapterNumbers.push(chapter.number);
+                }
+                chapters[chapter.number] = chapter;
             }
-            chapters[chapter.number] = chapter;
         });
         chapterNumbers.sort((a, b) => parseFloat(b) - parseFloat(a));
         this.setState({chapters: chapters, chapterNumbers: chapterNumbers});
@@ -104,6 +109,7 @@ class Chapter extends React.Component {
                 <div className="controls">
                     <a onClick={() => fetch(this.props.chapter._links.download.href)} className="button-inline">DL</a>
                     <a onClick={() => fetch(this.props.chapter._links.ignore.href)} className="button-inline">IGN</a>
+                    <a onClick={() => fetch(this.props.chapter._links.delete.href)} className="button-inline">DEL</a>
                     <Page
                         key={`page-${this.props.manga.id}-${this.props.chapter.number}`}
                         manga={this.props.manga}

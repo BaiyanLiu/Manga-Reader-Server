@@ -11,6 +11,7 @@ import com.baiyanliu.mangareader.entity.Page;
 import com.baiyanliu.mangareader.entity.repository.ChapterRepository;
 import com.baiyanliu.mangareader.entity.repository.MangaRepository;
 import com.baiyanliu.mangareader.messaging.MessageFactory;
+import com.baiyanliu.mangareader.messaging.UpdateType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.hibernate.Hibernate;
@@ -78,7 +79,7 @@ public class MangaController {
                         mangaRepository.save(manga);
                         chapterRepository.save(chapter);
                         messageFactory.createMangaMessage(manga);
-                        messageFactory.createChapterMessage(manga, Collections.singletonList(chapter));
+                        messageFactory.createChapterMessage(manga, Collections.singletonList(chapter), UpdateType.UPDATE);
                     }
 
                     return ResponseEntity.ok(EntityModel.of(page));
@@ -169,7 +170,30 @@ public class MangaController {
                 if (updateManga) {
                     messageFactory.createMangaMessage(manga);
                 }
-                messageFactory.createChapterMessage(manga, Collections.singletonList(chapter));
+                messageFactory.createChapterMessage(manga, Collections.singletonList(chapter), UpdateType.UPDATE);
+            }
+        });
+        return ResponseEntity.ok().build();
+    }
+
+    @RequestMapping("/deleteChapter")
+    public ResponseEntity<Void> deleteChapter(
+            @RequestParam("manga") Long mangaId,
+            @RequestParam("chapter") String chapterNumber) {
+        log.log(Level.INFO, String.format("deleteChapter - manga [%d] chapter [%s]", mangaId, chapterNumber));
+        mangaRepository.findById(mangaId).ifPresent(manga -> {
+            Chapter chapter = manga.getChapters().remove(chapterNumber);
+            if (chapter != null) {
+                boolean updateManga = !chapter.isRead() && !chapter.isIgnored();
+                if (updateManga) {
+                    manga.updateUnread(-1);
+                }
+
+                mangaRepository.save(manga);
+                if (updateManga) {
+                    messageFactory.createMangaMessage(manga);
+                }
+                messageFactory.createChapterMessage(manga, Collections.singletonList(chapter), UpdateType.DELETE);
             }
         });
         return ResponseEntity.ok().build();

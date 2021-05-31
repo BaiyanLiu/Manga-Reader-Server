@@ -6,6 +6,7 @@ import com.baiyanliu.mangareader.entity.Manga;
 import com.baiyanliu.mangareader.entity.Source;
 import com.baiyanliu.mangareader.entity.repository.ChapterRepository;
 import com.baiyanliu.mangareader.entity.repository.MangaRepository;
+import com.baiyanliu.mangareader.messaging.UpdateType;
 import com.google.common.collect.ImmutableMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -38,7 +39,7 @@ public class DownloaderDispatcher {
     private void onMetadataDownloaded(Manga manga) {
         mangaRepository.save(manga);
         downloadMessageHelper.createMangaMessage(manga);
-        downloadMessageHelper.createChapterMessage(manga, manga.getChapters().values());
+        downloadMessageHelper.createChapterMessage(manga, manga.getChapters().values(), UpdateType.UPDATE);
     }
 
     public void downloadChapter(Manga manga, String chapterNumber) {
@@ -47,6 +48,6 @@ public class DownloaderDispatcher {
 
     private void onChapterDownloaded(Chapter chapter) {
         chapterRepository.save(chapter);
-        downloadMessageHelper.createChapterMessage(chapter.getManga(), Collections.singletonList(chapter));
+        downloadMessageHelper.createChapterMessage(chapter.getManga(), Collections.singletonList(chapter), UpdateType.UPDATE);
     }
 }
