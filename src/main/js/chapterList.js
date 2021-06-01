@@ -60,12 +60,16 @@ export default class ChapterList extends React.Component {
     }
 
     render() {
-        const chapters = this.state.chapterNumbers.map(number =>
-            <Chapter
-                key={`chapter-${this.props.manga.id}-${number}`}
-                manga={this.props.manga}
-                chapter={this.state.chapters[number]}/>
-        );
+        const chapters = this.state.chapterNumbers.map(number => {
+            const chapter = this.state.chapters[number];
+            if (this.props.showAll || !chapter.ignored)
+            {
+                return <Chapter
+                    key={`chapter-${this.props.manga.id}-${number}`}
+                    manga={this.props.manga}
+                    chapter={chapter}/>
+            }
+        });
         return (
             <div className="inline">
                 <SockJsClient

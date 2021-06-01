@@ -13,7 +13,7 @@ class App extends React.Component {
     constructor(props) {
         super(props);
         this.root = 'api/mangas';
-        this.state = {mangas: [], links: [], fields: ['name', 'source', 'sourceId'], pageSize: 20};
+        this.state = {mangas: [], links: [], fields: ['name', 'source', 'sourceId'], showAll: false, pageSize: 20};
         this.home = `${this.root}?size=${this.state.pageSize}`;
         this.onNavigate = this.onNavigate.bind(this);
         this.onCreate = this.onCreate.bind(this);
@@ -115,6 +115,8 @@ class App extends React.Component {
                 <a onClick={() => fetch('api/updateAll')} className="button-inline">Update</a>
                 <a onClick={() => fetch('api/downloadAll')} className="button-inline">Download</a>
                 <br/><br/>
+                <a onClick={() => this.setState({showAll: !this.state.showAll})} className={this.state.showAll ? "button-toggle-positive" : "button-toggle-negative"}>Show All</a>
+                <br/><br/>
                 <CreateDialog
                     fields={this.state.fields}
                     onCreate={this.onCreate}/>
@@ -123,6 +125,7 @@ class App extends React.Component {
                     mangas={this.state.mangas}
                     fields={this.state.fields}
                     links={this.state.links}
+                    showAll={this.state.showAll}
                     onNavigate={this.onNavigate}
                     onUpdate={this.onUpdate}
                     onDelete={this.onDelete}/>

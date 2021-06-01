@@ -5,10 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.util.Date;
 
 @Data
@@ -18,7 +15,7 @@ import java.util.Date;
 public class ErrorMessage extends LogMessage {
     @GeneratedValue(generator = "errorMessageId") @Id private long id;
 
-    private String error;
+    @Lob private String error;
 
     public ErrorMessage(String error) {
         super(new Date());

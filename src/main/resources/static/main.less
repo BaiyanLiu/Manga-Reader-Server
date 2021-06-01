@@ -13,6 +13,12 @@ body {
     margin-right: 5px;
 }
 
+.negative {
+    &:hover {
+        background-color: red;
+    }
+}
+
 .button {
     background-color: black;
     border: 1px solid white;
@@ -28,14 +34,26 @@ body {
 
 .button-negative {
     .button();
-    &:hover {
-        background-color: red;
-    }
+    .negative();
 }
 
 .button-inline {
     .button();
     .inline-margin();
+}
+
+.button-toggle-negative {
+    .button-inline();
+    background-color: red;
+    &:hover {
+        background-color: rgb(34, 177, 76);
+    }
+}
+
+.button-toggle-positive {
+    .button-inline();
+    .negative();
+    background-color: rgb(34, 177, 76);
 }
 
 .button-left {

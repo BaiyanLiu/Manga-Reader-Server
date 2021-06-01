@@ -40,6 +40,7 @@ export default class MangaList extends React.Component {
                 key={manga._links.self.href}
                 manga={manga}
                 fields={this.props.fields}
+                showAll={this.props.showAll}
                 onUpdate={this.props.onUpdate}
                 onDelete={this.props.onDelete}/>
         );
@@ -104,7 +105,9 @@ class Manga extends React.Component {
                     </div>
                     <a onClick={() => fetch(this.props.manga._links.update.href)} className="button-inline">UPD</a>
                     <a onClick={() => fetch(this.props.manga._links.download.href)} className="button-inline">DL</a>
-                    <ChapterList manga={this.props.manga}/>
+                    <ChapterList
+                        manga={this.props.manga}
+                        showAll={this.props.showAll}/>
                 </td>
                 <td className={textStyle}>{this.props.manga.source}</td>
                 <td className={textStyle}>{new Date(this.props.manga.lastRead).toLocaleString()}</td>
