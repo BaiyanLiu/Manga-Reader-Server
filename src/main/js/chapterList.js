@@ -86,6 +86,7 @@ class Chapter extends React.Component {
 
     constructor(props) {
         super(props);
+        this.addDownloadControl = this.addDownloadControl.bind(this);
     }
 
     getTextStyle(chapter) {
@@ -100,6 +101,12 @@ class Chapter extends React.Component {
         }
     }
 
+    addDownloadControl() {
+        if (this.props.chapter._links.download) {
+            return <a onClick={() => fetch(this.props.chapter._links.download.href)} className="button-inline">DL</a>
+        }
+    }
+
     render() {
         return (
             <div className="chapter">
@@ -107,7 +114,7 @@ class Chapter extends React.Component {
                     {this.props.chapter.name}
                 </div>
                 <div className="controls">
-                    <a onClick={() => fetch(this.props.chapter._links.download.href)} className="button-inline">DL</a>
+                    {this.addDownloadControl()}
                     <a onClick={() => fetch(this.props.chapter._links.ignore.href)} className="button-inline">IGN</a>
                     <a onClick={() => fetch(this.props.chapter._links.delete.href)} className="button-inline">DEL</a>
                     <Page

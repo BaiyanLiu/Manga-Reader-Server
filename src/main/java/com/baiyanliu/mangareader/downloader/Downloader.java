@@ -7,6 +7,7 @@ import com.baiyanliu.mangareader.downloader.messaging.Status;
 import com.baiyanliu.mangareader.entity.Chapter;
 import com.baiyanliu.mangareader.entity.Manga;
 import com.baiyanliu.mangareader.entity.Page;
+import com.google.common.collect.Sets;
 import lombok.extern.java.Log;
 import org.openqa.selenium.ElementNotInteractableException;
 import org.openqa.selenium.StaleElementReferenceException;
@@ -22,7 +23,9 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -80,6 +83,9 @@ abstract class Downloader {
                     }
                 }
 
+                Set<String> oldChapters = new HashSet<>(manga.getChapters().keySet());
+                Set<String> newChapters = new HashSet<>();
+
                 for (String chapterNumber : getChapterNumbers(driver)) {
                     logger.log(Level.INFO, "Found chapter", String.format("URL [%s] chapter [%s] ", url, chapterNumber));
                     if (!manga.getChapters().containsKey(chapterNumber)) {
@@ -90,6 +96,12 @@ abstract class Downloader {
                             downloadMessageHelper.createUpdateMessage(manga, chapterNumber);
                         }
                     }
+                    newChapters.add(chapterNumber);
+                }
+
+                Set<String> orphanedChapters = Sets.difference(oldChapters, newChapters);
+                for (Chapter chapter : manga.getChapters().values()) {
+                    chapter.setOrphaned(orphanedChapters.contains(chapter.getNumber()));
                 }
 
                 logger.log(Level.INFO, "Finished download task", String.format("URL [%s] chapters [%d] ", url, manga.getChapters().size()));
