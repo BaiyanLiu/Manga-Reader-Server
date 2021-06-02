@@ -168,7 +168,7 @@ class CreateDialog extends React.Component {
                         <a href="#" className="close">X</a>
                         <form>
                             {inputs}
-                            <a onClick={this.handleSubmit} className="button">Create</a>
+                            <a onClick={this.handleSubmit} className="button-positive">Create</a>
                         </form>
                     </div>
                 </div>

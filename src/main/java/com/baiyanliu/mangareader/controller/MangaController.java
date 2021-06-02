@@ -1,10 +1,6 @@
 package com.baiyanliu.mangareader.controller;
 
 import com.baiyanliu.mangareader.downloader.DownloaderDispatcher;
-import com.baiyanliu.mangareader.downloader.TaskManager;
-import com.baiyanliu.mangareader.downloader.messaging.DownloadMessageHelper;
-import com.baiyanliu.mangareader.downloader.messaging.Status;
-import com.baiyanliu.mangareader.downloader.messaging.repository.DownloadMessageRepository;
 import com.baiyanliu.mangareader.entity.Chapter;
 import com.baiyanliu.mangareader.entity.Manga;
 import com.baiyanliu.mangareader.entity.Page;
@@ -36,11 +32,7 @@ import java.util.stream.Collectors;
 public class MangaController {
     private final MangaRepository mangaRepository;
     private final ChapterRepository chapterRepository;
-    private final DownloadMessageRepository downloadMessageRepository;
-
     private final DownloaderDispatcher downloaderDispatcher;
-    private final TaskManager taskManager;
-    private final DownloadMessageHelper downloadMessageHelper;
     private final MessageFactory messageFactory;
 
     @GetMapping("/chapters/{manga}")
@@ -196,20 +188,6 @@ public class MangaController {
                 messageFactory.createChapterMessage(manga, Collections.singletonList(chapter), UpdateType.DELETE);
             }
         });
-        return ResponseEntity.ok().build();
-    }
-
-    @RequestMapping("/cancelDownload/{id}")
-    public ResponseEntity<Void> cancelDownload(@PathVariable("id") Long messageId) {
-        log.log(Level.INFO, String.format("cancelDownload - id [%d]", messageId));
-        taskManager.cancelTask(messageId);
-        return ResponseEntity.ok().build();
-    }
-
-    @RequestMapping("/resolveError/{id}")
-    public ResponseEntity<Void> resolveError(@PathVariable("id") Long messageId) {
-        log.log(Level.INFO, String.format("resolveError - id [%d]", messageId));
-        downloadMessageRepository.findById(messageId).ifPresent(message -> downloadMessageHelper.updateStatus(message, Status.RESOLVED));
         return ResponseEntity.ok().build();
     }
 }

@@ -21,6 +21,12 @@ body {
     }
 }
 
+.positive {
+    &:hover {
+        background-color: @positive-color-dark;
+    }
+}
+
 .button {
     background-color: black;
     border: 1px solid white;
@@ -39,23 +45,14 @@ body {
     .negative();
 }
 
+.button-positive {
+    .button();
+    .positive();
+}
+
 .button-inline {
     .button();
     .inline-margin();
-}
-
-.button-toggle-negative {
-    .button-inline();
-    background-color: @negative-color-dark;
-    &:hover {
-        background-color: @positive-color-dark;
-    }
-}
-
-.button-toggle-positive {
-    .button-inline();
-    .negative();
-    background-color: @positive-color-dark;
 }
 
 .button-left {
@@ -63,10 +60,20 @@ body {
     float: left;
 }
 
-.button-right {
+.button-inline-negative {
     .button-inline();
-    float: right;
-    margin-right: 0;
+    .negative();
+}
+
+.button-toggle-negative {
+    .button-inline();
+    .positive();
+    background-color: @negative-color-dark;
+}
+
+.button-toggle-positive {
+    .button-inline-negative();
+    background-color: @positive-color-dark;
 }
 
 input {

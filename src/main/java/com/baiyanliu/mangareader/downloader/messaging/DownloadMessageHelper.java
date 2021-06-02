@@ -53,6 +53,12 @@ public class DownloadMessageHelper extends MessageFactory {
         saveAndSend(message);
     }
 
+    public void updateStatusAll(Iterable<DownloadMessage> messages, Status status) {
+        messages.forEach((message) -> message.setStatus(status));
+        downloadMessageRepository.saveAll(messages);
+        messages.forEach((message) -> message.send(webSocket));
+    }
+
     private void saveAndSend(DownloadMessage message) {
         downloadMessageRepository.save(message);
         message.send(webSocket);

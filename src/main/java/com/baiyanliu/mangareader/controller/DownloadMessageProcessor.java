@@ -21,9 +21,9 @@ public class DownloadMessageProcessor implements RepresentationModelProcessor<En
     public static Collection<Link> generateLinks(DownloadMessage message) {
         List<Link> links = new ArrayList<>();
         if (message.getStatus() == Status.STARTED) {
-            links.add(linkTo(methodOn(MangaController.class).cancelDownload(message.getId())).withRel("cancel"));
+            links.add(linkTo(methodOn(DownloadMessageController.class).cancelDownload(message.getId())).withRel("cancel"));
         } else if (message.getStatus() == Status.ERROR) {
-            links.add(linkTo(methodOn(MangaController.class).resolveError(message.getId())).withRel("resolve"));
+            links.add(linkTo(methodOn(DownloadMessageController.class).resolveError(message.getId())).withRel("resolve"));
         }
         return links;
     }

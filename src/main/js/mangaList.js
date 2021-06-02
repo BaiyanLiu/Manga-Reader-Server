@@ -163,7 +163,7 @@ class UpdateDialog extends React.Component {
                         <a href="#" title="Close" className="close">X</a>
                         <form>
                             {inputs}
-                            <a onClick={this.handleSubmit} className="button">Update</a>
+                            <a onClick={this.handleSubmit} className="button-positive">Update</a>
                         </form>
                     </div>
                 </div>

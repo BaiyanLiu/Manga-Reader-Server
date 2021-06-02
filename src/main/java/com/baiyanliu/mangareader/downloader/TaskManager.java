@@ -30,10 +30,17 @@ public class TaskManager {
     }
 
     public synchronized void cancelTask(Long messageId) {
-        if (tasks.containsKey(messageId)) {
-            tasks.get(messageId).cancel(true);
+        Future<Void> task = tasks.remove(messageId);
+        if (task != null) {
+            task.cancel(true);
             Optional<DownloadMessage> message = downloadMessageRepository.findById(messageId);
             message.ifPresent(downloadMessage -> downloadMessageHelper.updateStatus(downloadMessage, Status.CANCELLED));
         }
+    }
+
+    public synchronized void cancelAll() {
+        tasks.values().forEach((task) -> task.cancel(true));
+        downloadMessageHelper.updateStatusAll(downloadMessageRepository.findAllById(tasks.keySet()), Status.CANCELLED);
+        tasks.clear();
     }
 }

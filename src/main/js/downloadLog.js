@@ -73,9 +73,9 @@ export default class DownloadLog extends React.Component {
     addControls(message) {
         if (message._links) {
             if (message._links.cancel) {
-                return <a className="button-right" onClick={() => fetch(message._links.cancel.href)}>Cancel</a>;
+                return <a className="button-inline-negative" onClick={() => fetch(message._links.cancel.href)}>Cancel</a>;
             } else if (message._links.resolve) {
-                return <a className="button-right" onClick={() => fetch(message._links.resolve.href)}>Resolve</a>;
+                return <a className="button-inline" onClick={() => fetch(message._links.resolve.href)}>Resolve</a>;
             }
         }
     }
@@ -83,7 +83,7 @@ export default class DownloadLog extends React.Component {
     render() {
         const messages = this.state.messageIds.map(id => {
             const message = this.state.messages[id];
-            return <div className={"line" + this.getTextStyle(message)}>{this.formatMessage(message)}{this.addControls(message)}</div>;
+            return <div className={"line" + this.getTextStyle(message)}>{this.addControls(message)}{this.formatMessage(message)}</div>;
         });
         return (
             <div>
@@ -96,7 +96,9 @@ export default class DownloadLog extends React.Component {
                     <div className="popup-big">
                         <h2>Downloads</h2>
                         <a href="#" className="close">X</a>
-                        <div className="log">
+                        <a onClick={() => fetch('api/cancelAll')} className="button-negative">Cancel All</a>
+                        <br/><br/>
+                        <div className="download-log">
                             {messages}
                         </div>
                     </div>
