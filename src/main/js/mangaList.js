@@ -34,7 +34,11 @@ export default class MangaList extends React.Component {
     }
 
     render() {
-        this.props.mangas.sort((a, b) => (a.lastRead === null) - (b.lastRead === null) || b.lastRead > a.lastRead);
+        this.props.mangas.sort((a, b) => {
+            return (a.unread === 0) - (b.unread === 0)
+                || (a.lastRead === null) - (b.lastRead === null)
+                || b.lastRead > a.lastRead
+        });
         const mangas = this.props.mangas.map(manga =>
             <Manga
                 key={manga._links.self.href}

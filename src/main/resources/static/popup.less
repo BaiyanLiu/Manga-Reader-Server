@@ -1,3 +1,5 @@
+@import "library";
+
 .overlay {
     background: rgba(0, 0, 0, 0.8);
     inset: 0;
@@ -29,7 +31,7 @@
         right: 21px;
         top: 15px;
         &:hover {
-            color: red;
+            color: @negative-color;
         }
     }
 }
@@ -61,17 +63,17 @@
         margin: 5px 0;
     }
     & .completed {
-        color: rgb(128, 128, 128);
+        color: @gray;
     }
     & .cancelled {
-        color: rgb(64, 64, 64);
+        color: @gray-dark;
         text-decoration: line-through;
     }
     & .error {
-        color: red;
+        color: @negative-color;
     }
     & .resolved {
-        color: rgb(128, 0, 0);
+        color: @negative-color-dark;
         text-decoration: line-through;
     }
 }

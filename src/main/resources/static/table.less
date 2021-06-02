@@ -1,3 +1,5 @@
+@import "library";
+
 table {
     border-collapse: collapse;
 }
@@ -13,16 +15,16 @@ td, th {
 }
 
 .read {
-    color: rgb(128, 128, 128);
+    color: @gray;
 }
 
 .chapter {
     margin: 5px 0;
     & .new {
-        color: rgb(255, 242, 0);
+        color: @neutral-color;
     }
     & .ignored {
-        color: rgb(64, 64, 64);
+        color: @gray-dark;
         text-decoration: line-through;
     }
     & .controls {

@@ -1,3 +1,5 @@
+@import "library";
+
 body {
     background-color: black;
     color: white;
@@ -15,7 +17,7 @@ body {
 
 .negative {
     &:hover {
-        background-color: red;
+        background-color: @negative-color-dark;
     }
 }
 
@@ -28,7 +30,7 @@ body {
     padding: 2px;
     text-decoration: none;
     &:hover {
-        background-color: rgb(63, 72, 204);
+        background-color: @default-color;
     }
 }
 
@@ -44,16 +46,16 @@ body {
 
 .button-toggle-negative {
     .button-inline();
-    background-color: red;
+    background-color: @negative-color-dark;
     &:hover {
-        background-color: rgb(34, 177, 76);
+        background-color: @positive-color-dark;
     }
 }
 
 .button-toggle-positive {
     .button-inline();
     .negative();
-    background-color: rgb(34, 177, 76);
+    background-color: @positive-color-dark;
 }
 
 .button-left {
@@ -62,13 +64,13 @@ body {
 }
 
 .button-right {
-    .button();
-    .inline();
+    .button-inline();
     float: right;
+    margin-right: 0;
 }
 
 input {
-    background-color: rgb(64, 64, 64);
+    background-color: @gray-dark;
     border: 1px solid white;
     color: white;
 }
