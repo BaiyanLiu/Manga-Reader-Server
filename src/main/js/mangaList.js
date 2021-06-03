@@ -151,7 +151,7 @@ class UpdateDialog extends React.Component {
     }
 
     render() {
-        const sources = this.props.sources.map(source => <option value={source}>{source}</option>);
+        const sources = this.props.sources.map(source => <option value={source} selected={source === this.props.manga.source}>{source}</option>);
         const inputs = this.props.fields.map(field => {
             if (field === "source") {
                 return <p><select ref={field}>{sources}</select></p>;

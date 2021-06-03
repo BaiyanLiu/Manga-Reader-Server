@@ -25,7 +25,10 @@ class App extends React.Component {
     initSources() {
         fetch("api/sources")
             .then(response => response.json())
-            .then(data => this.setState({sources: data}));
+            .then(data => {
+                data.sort();
+                this.setState({sources: data})
+            });
     }
 
     onNavigate(uri) {
