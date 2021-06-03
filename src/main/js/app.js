@@ -13,13 +13,19 @@ class App extends React.Component {
     constructor(props) {
         super(props);
         this.root = 'api/mangas';
-        this.state = {mangas: [], links: [], fields: ['name', 'source', 'sourceId'], showAll: false, pageSize: 20};
+        this.state = {mangas: [], links: [], fields: ['name', 'source', 'sourceId'], sources: [], showAll: false, pageSize: 20};
         this.home = `${this.root}?size=${this.state.pageSize}`;
         this.onNavigate = this.onNavigate.bind(this);
         this.onCreate = this.onCreate.bind(this);
         this.onUpdate = this.onUpdate.bind(this);
         this.onDelete = this.onDelete.bind(this);
         this.onMessage = this.onMessage.bind(this);
+    }
+
+    initSources() {
+        fetch("api/sources")
+            .then(response => response.json())
+            .then(data => this.setState({sources: data}));
     }
 
     onNavigate(uri) {
@@ -98,6 +104,7 @@ class App extends React.Component {
 
     componentDidMount() {
         document.addEventListener("keydown", this.handleKeyDown)
+        this.initSources();
         this.onNavigate(this.home);
     }
 
@@ -119,12 +126,14 @@ class App extends React.Component {
                 <br/><br/>
                 <CreateDialog
                     fields={this.state.fields}
+                    sources={this.state.sources}
                     onCreate={this.onCreate}/>
                 <br/>
                 <MangaList
                     mangas={this.state.mangas}
                     fields={this.state.fields}
                     links={this.state.links}
+                    sources={this.state.sources}
                     showAll={this.state.showAll}
                     onNavigate={this.onNavigate}
                     onUpdate={this.onUpdate}
@@ -154,11 +163,15 @@ class CreateDialog extends React.Component {
     }
 
     render() {
-        const inputs = this.props.fields.map(field =>
-            <p key={field}>
-                <input type="text" placeholder={field.charAt(0).toUpperCase() + field.slice(1)} ref={field} className="input"/>
-            </p>
-        );
+        const sources = this.props.sources.map(source => <option value={source}>{source}</option>);
+        const inputs = this.props.fields.map(field => {
+            if (field === "source") {
+                return <p><select ref={field}>{sources}</select></p>;
+            } else {
+                return <p><input type="text" placeholder={field.charAt(0).toUpperCase() + field.slice(1)} ref={field}/></p>;
+            }
+        });
+
         return (
             <div>
                 <a href={"#createManga"} className="button">Create</a>

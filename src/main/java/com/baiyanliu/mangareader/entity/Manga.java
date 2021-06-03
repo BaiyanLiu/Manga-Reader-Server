@@ -17,7 +17,7 @@ public class Manga {
     @GeneratedValue(generator = "mangaId") @Id private long id;
     @JsonIgnore @Version private long version;
 
-    private String name;
+    @Column(unique = true) private String name;
     private Source source;
     private String sourceId;
     private Date lastRead;

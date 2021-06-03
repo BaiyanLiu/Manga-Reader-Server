@@ -4,6 +4,7 @@ import com.baiyanliu.mangareader.downloader.DownloaderDispatcher;
 import com.baiyanliu.mangareader.entity.Chapter;
 import com.baiyanliu.mangareader.entity.Manga;
 import com.baiyanliu.mangareader.entity.Page;
+import com.baiyanliu.mangareader.entity.Source;
 import com.baiyanliu.mangareader.entity.repository.ChapterRepository;
 import com.baiyanliu.mangareader.entity.repository.MangaRepository;
 import com.baiyanliu.mangareader.messaging.MessageFactory;
@@ -189,5 +190,10 @@ public class MangaController {
             }
         });
         return ResponseEntity.ok().build();
+    }
+
+    @RequestMapping("/sources")
+    public ResponseEntity<Source[]> getSources() {
+        return ResponseEntity.ok(Source.values());
     }
 }

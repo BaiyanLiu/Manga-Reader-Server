@@ -1,6 +1,7 @@
 'use strict';
 
 import React from 'react';
+import ReactDOM from 'react-dom';
 import ChapterList from "./chapterList";
 
 export default class MangaList extends React.Component {
@@ -44,6 +45,7 @@ export default class MangaList extends React.Component {
                 key={manga._links.self.href}
                 manga={manga}
                 fields={this.props.fields}
+                sources={this.props.sources}
                 showAll={this.props.showAll}
                 onUpdate={this.props.onUpdate}
                 onDelete={this.props.onDelete}/>
@@ -120,6 +122,7 @@ class Manga extends React.Component {
                     <UpdateDialog
                         manga={this.props.manga}
                         fields={this.props.fields}
+                        sources={this.props.sources}
                         onUpdate={this.props.onUpdate}/>
                 </td>
                 <td>
@@ -148,11 +151,21 @@ class UpdateDialog extends React.Component {
     }
 
     render() {
-        const inputs = this.props.fields.map(field =>
-            <p key={field}>
-                <input type="text" placeholder={field} defaultValue={this.props.manga[field]} ref={field} className="field"/>
-            </p>
-        );
+        const sources = this.props.sources.map(source => <option value={source}>{source}</option>);
+        const inputs = this.props.fields.map(field => {
+            if (field === "source") {
+                return <p><select ref={field}>{sources}</select></p>;
+            } else {
+                return <p>
+                            <input type="text"
+                                   placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+                                   defaultValue={this.props.manga[field]}
+                                   readOnly={field === "name"}
+                                   ref={field}/>
+                        </p>;
+            }
+        });
+
         const id = "updateManga-" + this.props.manga._links.self.href;
         return (
             <div key={this.props.manga._links.self.href}>
