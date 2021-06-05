@@ -16,7 +16,7 @@ import java.util.Map;
 
 @Component
 public class DownloaderDispatcher {
-    private final Map<Source, Downloader> downloaders;
+    private final Map<Source, Downloader<?>> downloaders;
 
     private final MangaRepository mangaRepository;
     private final ChapterRepository chapterRepository;

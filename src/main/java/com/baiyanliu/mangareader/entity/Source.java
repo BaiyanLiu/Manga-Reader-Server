@@ -10,8 +10,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public enum Source {
     MANGA_SEE("MangaSee"),
-    MANGA_PLUS("MANGA Plus"),
-    VIZ("VIZ"),
     MANGA_DEX("MangaDex");
 
     private static final Map<String, Source> nameToSource = new HashMap<>();

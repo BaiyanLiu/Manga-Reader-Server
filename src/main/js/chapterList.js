@@ -120,7 +120,7 @@ class Chapter extends React.Component {
                 <div className="controls">
                     {this.addDownloadControl()}
                     <a onClick={() => fetch(this.props.chapter._links.ignore.href)} className="button-inline">IGN</a>
-                    <a onClick={() => fetch(this.props.chapter._links.delete.href)} className="button-inline">DEL</a>
+                    <a onClick={() => fetch(this.props.chapter._links.delete.href)} className="button-inline-negative">DEL</a>
                     <Page
                         key={`page-${this.props.manga.id}-${this.props.chapter.number}`}
                         manga={this.props.manga}

@@ -9,9 +9,10 @@ import org.openqa.selenium.WebElement;
 import java.util.ArrayList;
 import java.util.List;
 
-class MangaSeeDownloader extends Downloader {
-    private static final String METADATA_URL = "https://mangasee123.com/manga/%s";
-    private static final String PAGE_URL = "https://mangasee123.com/read-online/%s-chapter-%s-page-%d.html";
+class MangaSeeDownloader extends WebDriverDownloader {
+    private static final String ROOT_URL = "https://mangasee123.com";
+    private static final String METADATA_URL = ROOT_URL + "/manga/%s";
+    private static final String PAGE_URL = ROOT_URL + "/read-online/%s-chapter-%s-page-%d.html";
 
     public MangaSeeDownloader(DownloadMessageHelper downloadMessageHelper, TaskManager taskManager) {
         super(downloadMessageHelper, taskManager);
@@ -20,11 +21,6 @@ class MangaSeeDownloader extends Downloader {
     @Override
     protected String getMetadataUrl(Manga manga) {
         return String.format(METADATA_URL, manga.getSourceId());
-    }
-
-    @Override
-    protected boolean isLoadChaptersRequired() {
-        return true;
     }
 
     @Override

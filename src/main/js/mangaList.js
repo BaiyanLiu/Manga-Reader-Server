@@ -116,7 +116,7 @@ class Manga extends React.Component {
                         showAll={this.props.showAll}/>
                 </td>
                 <td className={textStyle}>{this.props.manga.source}</td>
-                <td className={textStyle}>{new Date(this.props.manga.lastRead).toLocaleString()}</td>
+                <td className={textStyle}>{this.props.manga.lastRead ? new Date(this.props.manga.lastRead).toLocaleString() : ""}</td>
                 <td className={textStyle}>{this.props.manga.unread}</td>
                 <td>
                     <UpdateDialog

@@ -40,17 +40,17 @@ public abstract class DownloadMessage extends LogMessage {
 
     @JsonGetter(value = "mangaName")
     @Transient
-    public String getMangaName() {
+    public final String getMangaName() {
         return manga.getName();
     }
 
     @Override
-    protected String getDestination() {
+    protected final String getDestination() {
         return "/download";
     }
 
     @Override
-    protected Object prepareForSend() {
+    protected final Object prepareForSend() {
         return EntityModel.of(this, DownloadMessageProcessor.generateLinks(this));
     }
 }
